@@ -5,9 +5,9 @@ import sys
 import subprocess
 from getpass import getpass
 
-username = input('Enter username: ')
+username = input('Enter username (root): ') or 'root'
 print('\n-----\n')
-password = getpass('Enter password: ')
+password = getpass('Enter password (<empty>): ') or ''
 print('\n-----\n')
 ssh_key = input('Enter SSH key: ')
 print('\n-----\n')
