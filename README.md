@@ -23,5 +23,6 @@ python3 generate.py
 |Debian|13<br>12|
 |Fedora|43|
 |FreeBSD|14.3|
+|openSUSE|Tumbleweed<br>Leap 16.0<br>Leap Micro 6.2|
 |Rocky|10<br>9<br>8|
 |Ubuntu|25.10<br>25.04<br>24.04<br>22.04|
