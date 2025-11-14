@@ -24,5 +24,6 @@ python3 generate.py
 |Fedora|43|
 |FreeBSD|14.3|
 |openSUSE|Tumbleweed|
+|Oracle Linux|10.0<br>9.6<br>8.10<br>7.9|
 |Rocky|10<br>9<br>8|
 |Ubuntu|25.10<br>25.04<br>24.04<br>22.04|
