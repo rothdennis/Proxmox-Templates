@@ -18,15 +18,9 @@ python3 generate.py
 
 |OS|Version|
 |:---|:---|
-|Ubuntu|22.04|
-|Ubuntu|24.04|
-|Debian|12|
-|Debian|13|
+|Alpine|3.22<br>3.21<br>3.20|
+|Debian|13<br>12|
 |Fedora|43|
-|Rocky|8|
-|Rocky|9|
-|Rocky|10|
-|Alpine|22|
-|Alpine|21|
-|Alpine|20|
 |FreeBSD|14.3|
+|Rocky|10<br>9<br>8|
+|Ubuntu|25.10<br>25.04<br>24.04<br>22.04|
