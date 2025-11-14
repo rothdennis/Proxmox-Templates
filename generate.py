@@ -5,16 +5,36 @@ import sys
 import subprocess
 from getpass import getpass
 
-username = input('Enter username (root): ') or 'root'
-print('\n-----\n')
-password = getpass('Enter password: ') or ''
-print('\n-----\n')
-ssh_key = input('Enter SSH key: ')
-print('\n-----\n')
-storage= input('Enter storage (local-lvm): ') or 'local-lvm'
-print('\n-----\n')
-id= input('Enter VM ID: ')
-print('\n-----\n')
+### IMAGES ###
+
+images = {
+    'Ubuntu':[
+        {'22.04': 'https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img'},
+        {'24.04': 'https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img'}
+    ],
+    'Debian':[
+        {'12': 'https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2'},
+        {'13': 'https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2'}
+    ],
+    'Fedora':[
+        {'43': 'https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2'}
+    ],
+    'Rocky':[
+        {'8': 'https://dl.rockylinux.org/pub/rocky/8/images/x86_64/Rocky-8-GenericCloud-Base.latest.x86_64.qcow2'},
+        {'9': 'https://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2'},
+        {'10': 'https://dl.rockylinux.org/pub/rocky/10/images/x86_64/Rocky-10-GenericCloud-Base.latest.x86_64.qcow2'},
+    ],
+    'Alpine':[
+        {'3.20': 'https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/cloud/generic_alpine-3.20.8-x86_64-bios-cloudinit-r0.qcow2'},
+        {'3.21': 'https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/cloud/generic_alpine-3.21.5-x86_64-bios-cloudinit-r0.qcow2'},
+        {'3.22': 'https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/cloud/generic_alpine-3.22.2-x86_64-bios-cloudinit-r0.qcow2'},
+    ],
+    'FreeBSD':[
+        {'14.3': 'https://download.freebsd.org/releases/VM-IMAGES/14.3-RELEASE/amd64/Latest/FreeBSD-14.3-RELEASE-amd64-BASIC-CLOUDINIT-ufs.qcow2.xz'}
+    ]
+    }
+
+### HELPER FUNCTIONS ###
 
 def show_progress(block_num, block_size, total_size):
     downloaded = block_num * block_size
@@ -64,34 +84,19 @@ def generate_template():
     # cleanup
     subprocess.run(['rm', image_name])
     subprocess.run(['rm', 'temp_ssh_key.pub'])
-                
 
-images = {
-    'Ubuntu':[
-        {'22.04': 'https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img'},
-        {'24.04': 'https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img'}
-    ],
-    'Debian':[
-        {'12': 'https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2'},
-        {'13': 'https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2'}
-    ],
-    'Fedora':[
-        {'43': 'https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2'}
-    ],
-    'Rocky':[
-        {'8': 'https://dl.rockylinux.org/pub/rocky/8/images/x86_64/Rocky-8-GenericCloud-Base.latest.x86_64.qcow2'},
-        {'9': 'https://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2'},
-        {'10': 'https://dl.rockylinux.org/pub/rocky/10/images/x86_64/Rocky-10-GenericCloud-Base.latest.x86_64.qcow2'},
-    ],
-    'Alpine':[
-        {'3.20': 'https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/cloud/generic_alpine-3.20.8-x86_64-bios-cloudinit-r0.qcow2'},
-        {'3.21': 'https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/cloud/generic_alpine-3.21.5-x86_64-bios-cloudinit-r0.qcow2'},
-        {'3.22': 'https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/cloud/generic_alpine-3.22.2-x86_64-bios-cloudinit-r0.qcow2'},
-    ],
-    'FreeBSD':[
-        {'14.3': 'https://download.freebsd.org/releases/VM-IMAGES/14.3-RELEASE/amd64/Latest/FreeBSD-14.3-RELEASE-amd64-BASIC-CLOUDINIT-ufs.qcow2.xz'}
-    ]
-    }
+### INPUTS ###
+
+username = input('Enter username (root): ') or 'root'
+print('\n-----\n')
+password = getpass('Enter password: ') or ''
+print('\n-----\n')
+ssh_key = input('Enter SSH key: ')
+print('\n-----\n')
+storage= input('Enter storage (local-lvm): ') or 'local-lvm'
+print('\n-----\n')
+id= input('Enter VM ID: ')
+print('\n-----\n')
 
 print('Select OS')
 for i, disto in enumerate(images):
