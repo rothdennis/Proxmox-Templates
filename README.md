@@ -2,6 +2,13 @@
 
 Based on [this project](https://www.apalrd.net/posts/2023/pve_cloud/)
 
+## Usage 
+
+```bash
+curl -LO https://raw.githubusercontent.com/rothdennis/Proxmox-Templates/main/generate.py
+python3 generate.py
+```
+
 ## Supported Images
 
 |OS|Version|
