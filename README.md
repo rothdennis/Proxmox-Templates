@@ -1,11 +1,13 @@
 # Proxmox Templates
 
 > [!CAUTION]
-> Work in progess. Do not use in production.
+> Work in progess! Use with caution!
 
 Based on [this project](https://www.apalrd.net/posts/2023/pve_cloud/)
 
 ## Usage 
+
+Run the following commands on the `Console` for the specific Node:
 
 ```bash
 curl -LO https://raw.githubusercontent.com/rothdennis/Proxmox-Templates/main/generate.py
