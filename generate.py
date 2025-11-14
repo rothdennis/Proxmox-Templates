@@ -25,7 +25,7 @@ def show_progress(block_num, block_size, total_size):
         sys.stdout.write(f"\rDownloaded {downloaded} bytes")
         sys.stdout.flush()
 
-def generate_template(name):
+def generate_template():
     print(f'Generating template ...')
 
     # create new vm
@@ -119,5 +119,4 @@ if image_name.endswith('.xz'):
     print('\n-----\n')
 
 name = f'template-{"-".join(distro_name.lower().split())}-{list(images[distro_name][version_choice].keys())[0].replace(".","-")}'
-print(name)
-# generate_template(name)
+generate_template()
