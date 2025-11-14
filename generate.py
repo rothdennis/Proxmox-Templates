@@ -28,33 +28,38 @@ def show_progress(block_num, block_size, total_size):
 def generate_template():
     print(f'Generating template ...')
 
-    # create new vm
+    # create VM
     subprocess.run(['qm', 'create', id, '--name', name, '--ostype', 'l26'])
-    # set networking to default bridge
     subprocess.run(['qm', 'set', id, '--net0', 'virtio,bridge=vmbr0'])
-    # set memory, cpu, type defaults
     subprocess.run(['qm', 'set', id, '--memory', '1024', '--cores', '2', '--sockets', '1', '--cpu', 'host'])
-    # set boot device to new file
-    subprocess.run(['qm', 'set', id, '--scsi0', f'{storage}:0,import-from={image_name},discard=on'])
-    # set scsi hardware as default boot disk using virtio scsi single
+    
+    # import disk
+    subprocess.run(['qm', 'importdisk', id, image_name, storage])
+    subprocess.run(['qm', 'set', id, '--scsi0', f'{storage}:vm-{id}-disk-0,discard=on'])
     subprocess.run(['qm', 'set', id, '--boot', 'order=scsi0', '--scsihw', 'virtio-scsi-single'])
-    # enable Qemu guest agent in case the guest has it available
-    subprocess.run(['qm', 'set', id, '--agent', 'enabled=1,fstrim_cloned_disks=1'])
-    # add cloud-init device
+    
+    # cloud-init
     subprocess.run(['qm', 'set', id, '--ide2', f'{storage}:cloudinit'])
-    # set CI ip config
     subprocess.run(['qm', 'set', id, '--ipconfig0', 'ip6=auto,ip=dhcp'])
-    # set ssh key
-    subprocess.run(['qm', 'set', id, '--sshkey', ssh_key])
-    # set username
     subprocess.run(['qm', 'set', id, '--ciuser', username])
-    # resize the disk to 10G
+
+    # save SSH key to temp file
+    with open('temp_ssh_key.pub', 'w') as f:
+        f.write(ssh_key)
+    subprocess.run(['qm', 'set', id, '--sshkey', 'temp_ssh_key.pub'])
+
+    # resize disk
     subprocess.run(['qm', 'resize', id, 'scsi0', '10G'])
-    # finally convert to template
+
+    # enable qemu-guest-agent
+    subprocess.run(['qm', 'set', id, '--agent', 'enabled=1,fstrim_cloned_disks=1'])
+
+    # convert to template
     subprocess.run(['qm', 'template', id])
 
-    # delete downloaded image
+    # cleanup
     subprocess.run(['rm', image_name])
+    subprocess.run(['rm', 'temp_ssh_key.pub'])
                 
 
 images = {
