@@ -7,7 +7,7 @@ from getpass import getpass
 
 username = input('Enter username (root): ') or 'root'
 print('\n-----\n')
-password = getpass('Enter password (<empty>): ') or ''
+password = getpass('Enter password: ') or ''
 print('\n-----\n')
 ssh_key = input('Enter SSH key: ')
 print('\n-----\n')
