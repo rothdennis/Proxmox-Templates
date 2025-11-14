@@ -32,6 +32,8 @@ images = {
     'FreeBSD':[
         {'14.3': 'https://download.freebsd.org/releases/VM-IMAGES/14.3-RELEASE/amd64/Latest/FreeBSD-14.3-RELEASE-amd64-BASIC-CLOUDINIT-ufs.qcow2.xz'},
     ],
+    'openSUSE':[
+        {'Tumbleweed':'https://download.opensuse.org/tumbleweed/appliances/openSUSE-Tumbleweed-Minimal-VM.x86_64-Cloud.qcow2'},    ],
     'Rocky':[
         {'10': 'https://dl.rockylinux.org/pub/rocky/10/images/x86_64/Rocky-10-GenericCloud-Base.latest.x86_64.qcow2'},
         {'9': 'https://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2'},
@@ -144,5 +146,9 @@ if image_name.endswith('.xz'):
 
     print('\n-----\n')
 
-name = f'template-{"-".join(distro_name.lower().split())}-{list(images[distro_name][version_choice].keys())[0].replace(".","-")}'
+# generate template name
+prefix = 'template'
+os_name = distro_name.lower().replace(' ', '-')
+os_version = list(images[distro_name][version_choice].keys())[0].lower().replace(' ', '-').replace('.', '-')
+name = f'{prefix}-{os_name}-{os_version}'
 generate_template()
