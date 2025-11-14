@@ -113,6 +113,7 @@ urllib.request.urlretrieve(image_url, image_name, reporthook=show_progress)
 
 print('\n-----\n')
 
+# extract if needed
 if image_name.endswith('.xz'):
     decompressed_name = image_name[:-3]
     print(f'Decompressing {image_name} to {decompressed_name} ...')
