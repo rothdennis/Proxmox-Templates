@@ -16,8 +16,10 @@ python3 generate.py
 ## Supported Images
 
 |OS|Version|
-|:---|:---|
+|:---|---:|
 |Alpine|3.22<br>3.21<br>3.20|
+|Alma Linux|10<br>9<br>8|
+|CentOS Stream|10<br>9|
 |Debian|13<br>12|
 |Fedora|43|
 |FreeBSD|14.3|
