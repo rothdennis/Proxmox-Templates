@@ -7,7 +7,7 @@ Based on [this project](https://www.apalrd.net/posts/2023/pve_cloud/)
 Run the following commands on the `Console` for the specific Node:
 
 ```bash
-curl -LO https://raw.githubusercontent.com/rothdennis/Proxmox-Templates/main/generate.py
+wget https://raw.githubusercontent.com/rothdennis/Proxmox-Templates/main/generate.py
 python3 generate.py
 ```
 
