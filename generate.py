@@ -3,8 +3,11 @@ import lzma
 import shutil
 import sys
 import subprocess
+from getpass import getpass
 
 username = input('Enter username: ')
+print('\n-----\n')
+password = getpass('Enter password: ')
 print('\n-----\n')
 ssh_key = input('Enter SSH key: ')
 print('\n-----\n')
@@ -42,6 +45,7 @@ def generate_template():
     subprocess.run(['qm', 'set', id, '--ide2', f'{storage}:cloudinit'])
     subprocess.run(['qm', 'set', id, '--ipconfig0', 'ip6=auto,ip=dhcp'])
     subprocess.run(['qm', 'set', id, '--ciuser', username])
+    subprocess.run(['qm', 'set', id, '--cipassword', password])
 
     # save SSH key to temp file
     with open('temp_ssh_key.pub', 'w') as f:
