@@ -61,6 +61,7 @@ The script supports the following operating systems and versions:
 |:---|:---------|
 | **Alpine** | 3.22, 3.21, 3.20 |
 | **Alma Linux** | 10, 9, 8 |
+| **Arch Linux** | Latest |
 | **CentOS Stream** | 10, 9 |
 | **Debian** | 13 (Trixie), 12 (Bookworm) |
 | **Fedora** | 43 |

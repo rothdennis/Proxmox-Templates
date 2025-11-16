@@ -31,6 +31,9 @@ IMAGES = {
         {'3.21': 'https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/cloud/generic_alpine-3.21.5-x86_64-bios-cloudinit-r0.qcow2'},
         {'3.20': 'https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/cloud/generic_alpine-3.20.8-x86_64-bios-cloudinit-r0.qcow2'},
     ],
+    'Arch Linux':[
+        {'Latest': 'https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2'},
+    ],
     'CentOS Stream':[
         {'10': 'https://cloud.centos.org/centos/10-stream/x86_64/IMAGES/CentOS-Stream-GenericCloud-10-latest.x86_64.qcow2'},
         {'9': 'https://cloud.centos.org/centos/9-stream/x86_64/IMAGES/CentOS-Stream-GenericCloud-x86_64-9-latest.x86_64.qcow2'},
