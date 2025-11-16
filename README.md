@@ -61,10 +61,11 @@ The script supports the following operating systems and versions:
 |:---|:---------|
 | **Alpine** | 3.22, 3.21, 3.20 |
 | **Alma Linux** | 10, 9, 8 |
+| **Amazon Linux** | 2023, 2 |
 | **Arch Linux** | Latest |
 | **CentOS Stream** | 10, 9 |
 | **Debian** | 13 (Trixie), 12 (Bookworm) |
-| **Fedora** | 43 |
+| **Fedora** | Cloud 43 |
 | **openSUSE** | Tumbleweed |
 | **Oracle Linux** | 10.0, 9.6, 8.10, 7.9 |
 | **Rocky Linux** | 10, 9, 8 |

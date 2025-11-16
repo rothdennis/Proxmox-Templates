@@ -31,6 +31,10 @@ IMAGES = {
         {'3.21': 'https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/cloud/generic_alpine-3.21.5-x86_64-bios-cloudinit-r0.qcow2'},
         {'3.20': 'https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/cloud/generic_alpine-3.20.8-x86_64-bios-cloudinit-r0.qcow2'},
     ],
+    'Amazon Linux':[
+        {'2023': 'https://cdn.amazonlinux.com/al2023/os-images/2023.9.20251110.1/kvm/al2023-kvm-2023.9.20251110.1-kernel-6.1-x86_64.xfs.gpt.qcow2'},
+        {'2': 'https://cdn.amazonlinux.com/os-images/2.0.20251110.1/kvm/amzn2-kvm-2.0.20251110.1-x86_64.xfs.gpt.qcow2'},
+    ],
     'Arch Linux':[
         {'Latest': 'https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2'},
     ],
@@ -43,7 +47,7 @@ IMAGES = {
         {'12': 'https://cloud.debian.org/IMAGES/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2'},
     ],
     'Fedora':[
-        {'43': 'https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/IMAGES/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2'},
+        {'Cloud 43': 'https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2'},
     ],
     'openSUSE':[
         {'Tumbleweed':'https://download.opensuse.org/tumbleweed/appliances/openSUSE-Tumbleweed-Minimal-VM.x86_64-Cloud.qcow2'},
@@ -137,6 +141,7 @@ if image_name.endswith('.xz'):
     with lzma.open(image_name) as f_in:
         with open(decompressed_name, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
+    subprocess.run(['rm', image_name])
     image_name = decompressed_name
 
     print('\n-----\n')
