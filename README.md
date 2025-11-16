@@ -22,6 +22,8 @@ A Python-based tool for automating the creation of cloud-init enabled VM templat
 ## ✨ Features
 
 - **Automated Template Creation**: Streamlines the process of creating VM templates from cloud images
+- **Automatic VM ID Assignment**: Intelligently detects and assigns the next available VM ID (starting at 900)
+- **Smart Storage Selection**: Displays available storage pools for easy selection
 - **Cloud-Init Support**: Pre-configured cloud-init setup for easy VM customization
 - **Multiple OS Support**: Supports 10+ Linux distributions
 - **Interactive Interface**: User-friendly command-line prompts for easy configuration
@@ -245,10 +247,11 @@ Once created, you can use the template to create new VMs:
 **Solution**: Run the script again. It will automatically detect the next available ID. If the problem persists, you can manually verify available IDs with `qm list`.
 
 #### "Storage not found"
-**Problem**: The specified storage doesn't exist.  
+**Problem**: Selected storage doesn't exist or isn't accessible.  
 **Solution**: 
 - Check available storage: `pvesm status`
-- Use a valid storage name from the list
+- Ensure the storage is enabled and mounted
+- Select a different storage option from the list when prompted
 
 #### "Failed to download image"
 **Problem**: Network issues or broken image URL.  
