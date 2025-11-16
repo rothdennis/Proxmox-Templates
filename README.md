@@ -23,7 +23,7 @@ A Python-based tool for automating the creation of cloud-init enabled VM templat
 
 - **Automated Template Creation**: Streamlines the process of creating VM templates from cloud images
 - **Cloud-Init Support**: Pre-configured cloud-init setup for easy VM customization
-- **Multiple OS Support**: Supports 10+ Linux distributions and FreeBSD
+- **Multiple OS Support**: Supports 10+ Linux distributions
 - **Interactive Interface**: User-friendly command-line prompts for easy configuration
 - **SSH Key Integration**: Automatically configures SSH keys for secure access
 - **QEMU Guest Agent**: Pre-configured for better VM management
@@ -66,8 +66,6 @@ python3 generate.py
 
 4. **Wait for completion**: The script will download the image, create the template, and clean up temporary files.
 
-![Screenshot](images/screenshot1.png)
-
 ## 📦 Supported Images
 
 The script supports the following operating systems and versions:
@@ -79,7 +77,6 @@ The script supports the following operating systems and versions:
 | **CentOS Stream** | 10, 9 |
 | **Debian** | 13 (Trixie), 12 (Bookworm) |
 | **Fedora** | 43 |
-| **FreeBSD** | 14.3 |
 | **openSUSE** | Tumbleweed |
 | **Oracle Linux** | 10.0, 9.6, 8.10, 7.9 |
 | **Rocky Linux** | 10, 9, 8 |
