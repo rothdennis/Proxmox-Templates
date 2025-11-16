@@ -299,26 +299,40 @@ tail -f /var/log/pve/tasks/active
 
 ### Customizing Template Specifications
 
-You can modify the `generate.py` script to customize template specifications:
+You can modify the constants at the top of the `generate.py` script to customize default template specifications:
 
 #### Change Default Memory/CPU
 ```python
-subprocess.run(['qm', 'set', id, '--memory', '2048', '--cores', '4', '--sockets', '1'])
+MEMORY = 2048  # Default is 1024
+CORES = 4      # Default is 2
+SOCKETS = 1
+CPU = 'host'
 ```
 
 #### Change Disk Size
 ```python
-subprocess.run(['qm', 'resize', id, 'scsi0', '20G'])  # Instead of 10G
+DISK_SIZE = '20G'  # Default is 10G
 ```
 
 #### Use Different Network Bridge
 ```python
-subprocess.run(['qm', 'set', id, '--net0', 'virtio,bridge=vmbr1'])
+NETWORK_BRIDGE = 'vmbr1'  # Default is vmbr0
 ```
 
-#### Add Additional Disks
+#### Change Network Configuration
 ```python
-subprocess.run(['qm', 'set', id, '--scsi1', f'{storage}:32,discard=on'])
+IPV6 = 'auto'  # Default is auto
+IPV4 = 'dhcp'  # Default is dhcp
+```
+
+#### Change Template Naming Prefix
+```python
+PREFIX = 'my-template'  # Default is 'template'
+```
+
+#### Change Starting VM ID
+```python
+ID_START = 1000  # Default is 900
 ```
 
 ### Automation
