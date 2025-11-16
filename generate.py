@@ -15,6 +15,8 @@ DISK_SIZE = '10G'
 NETWORK_BRIDGE = 'vmbr0'
 IPV6 = 'auto'
 IPV4 = 'dhcp'
+PREFIX='template'
+ID_START=900
 
 ### IMAGES ###
 
@@ -39,9 +41,6 @@ IMAGES = {
     ],
     'Fedora':[
         {'43': 'https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/IMAGES/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2'},
-    ],
-    'FreeBSD':[
-        {'14.3': 'https://download.freebsd.org/releases/VM-IMAGES/14.3-RELEASE/amd64/Latest/FreeBSD-14.3-RELEASE-amd64-BASIC-CLOUDINIT-ufs.qcow2.xz'},
     ],
     'openSUSE':[
         {'Tumbleweed':'https://download.opensuse.org/tumbleweed/appliances/openSUSE-Tumbleweed-Minimal-VM.x86_64-Cloud.qcow2'},
@@ -79,43 +78,6 @@ def show_progress(block_num, block_size, total_size):
         sys.stdout.write(f"\rDownloaded {downloaded} bytes")
         sys.stdout.flush()
 
-def generate_template():
-    print(f'Generating template ...')
-
-    # create VM
-    subprocess.run(['qm', 'create', id, '--name', name, '--ostype', 'l26'])
-    subprocess.run(['qm', 'set', id, '--net0', f'virtio,bridge={NETWORK_BRIDGE}'])
-    subprocess.run(['qm', 'set', id, '--memory', str(MEMORY), '--cores', str(CORES), '--sockets', str(SOCKETS), '--cpu', CPU])
-    
-    # import disk
-    subprocess.run(['qm', 'importdisk', id, image_name, storage])
-    subprocess.run(['qm', 'set', id, '--scsi0', f'{storage}:vm-{id}-disk-0,discard=on'])
-    subprocess.run(['qm', 'set', id, '--boot', 'order=scsi0', '--scsihw', 'virtio-scsi-single'])
-    
-    # cloud-init
-    subprocess.run(['qm', 'set', id, '--ide2', f'{storage}:cloudinit'])
-    subprocess.run(['qm', 'set', id, '--ipconfig0', f'ip6={IPV6},ip={IPV4}'])
-    subprocess.run(['qm', 'set', id, '--ciuser', username])
-    subprocess.run(['qm', 'set', id, '--cipassword', password])
-
-    # save SSH key to temp file
-    with open('temp_ssh_key.pub', 'w') as f:
-        f.write(ssh_key)
-    subprocess.run(['qm', 'set', id, '--sshkey', 'temp_ssh_key.pub'])
-
-    # resize disk
-    subprocess.run(['qm', 'resize', id, 'scsi0', DISK_SIZE])
-
-    # enable qemu-guest-agent
-    subprocess.run(['qm', 'set', id, '--agent', 'enabled=1,fstrim_cloned_disks=1'])
-
-    # convert to template
-    subprocess.run(['qm', 'template', id])
-
-    # cleanup
-    subprocess.run(['rm', image_name])
-    subprocess.run(['rm', 'temp_ssh_key.pub'])
-
 ### INPUTS ###
 
 username = input('Enter username (root): ') or 'root'
@@ -124,28 +86,39 @@ password = getpass('Enter password: ') or ''
 print('\n-----\n')
 ssh_key = input('Enter SSH key: ')
 print('\n-----\n')
-storage= input('Enter storage (local-lvm): ') or 'local-lvm'
+res = subprocess.run("pvesm status | awk 'NR>1 {print $1}'", capture_output=True, text=True, shell=True)
+available_storages = res.stdout.strip().split('\n')
+print('Select storage\n')
+for i, storage in enumerate(available_storages):
+    print(f'{i+1}) {storage}')
+storage_choice = int(input('\nEnter choice: ')) - 1
+storage = available_storages[storage_choice]
 print('\n-----\n')
-id= input('Enter VM ID: ')
-print('\n-----\n')
+res = subprocess.run("qm list | awk 'NR>1 {print $1}'", capture_output=True, text=True, shell=True)
+used_ids = set(map(int, res.stdout.strip().split('\n')))
+while ID_START in used_ids:
+    ID_START += 1
+id = str(ID_START)
+# id= input('Enter VM ID: ')
+# print('\n-----\n')
 
-print('Select OS')
+print('Select OS\n')
 for i, disto in enumerate(IMAGES):
     print(f'{i+1}) {disto}')
-distro_choice = int(input('Enter choice: ')) - 1
+distro_choice = int(input('\nEnter choice: ')) - 1
 
 print('\n-----\n')
 
-print('Select Version')
+print('Select Version\n')
 distro_name = list(IMAGES.keys())[distro_choice]
 for i, version in enumerate(IMAGES[distro_name]):
     version_name = list(version.keys())[0]
     print(f'{i+1}) {version_name}')
-version_choice = int(input('Enter choice: ')) - 1
+version_choice = int(input('\nEnter choice: ')) - 1
 
 print('\n-----\n')
 
-# download image using wget
+### DOWNLOAD IMAGE ###
 image_url = list(IMAGES[distro_name][version_choice].values())[0]
 image_name = image_url.split('/')[-1]
 print(f'Downloading image from {image_url} ...')
@@ -153,7 +126,8 @@ urllib.request.urlretrieve(image_url, image_name, reporthook=show_progress)
 
 print('\n-----\n')
 
-# extract if needed
+### DECOMPRESS IMAGE IF NEEDED ###
+
 if image_name.endswith('.xz'):
     decompressed_name = image_name[:-3]
     print(f'Decompressing {image_name} to {decompressed_name} ...')
@@ -164,10 +138,46 @@ if image_name.endswith('.xz'):
 
     print('\n-----\n')
 
-# generate template name
-prefix = 'template'
+### GENERATE NAME ###
+
 os_name = distro_name.lower().replace(' ', '-')
 os_version = list(IMAGES[distro_name][version_choice].keys())[0].lower().replace(' ', '-').replace('.', '-')
-name = f'{prefix}-{os_name}-{os_version}'
+name = f'{PREFIX}-{os_name}-{os_version}'
 
-generate_template()
+### GENERATE TEMPLATE ###
+
+print(f'Generating template ...')
+
+# create VM
+subprocess.run(['qm', 'create', id, '--name', name, '--ostype', 'l26'])
+subprocess.run(['qm', 'set', id, '--net0', f'virtio,bridge={NETWORK_BRIDGE}'])
+subprocess.run(['qm', 'set', id, '--memory', str(MEMORY), '--cores', str(CORES), '--sockets', str(SOCKETS), '--cpu', CPU])
+
+# import disk
+subprocess.run(['qm', 'importdisk', id, image_name, storage])
+subprocess.run(['qm', 'set', id, '--scsi0', f'{storage}:vm-{id}-disk-0,discard=on'])
+subprocess.run(['qm', 'set', id, '--boot', 'order=scsi0', '--scsihw', 'virtio-scsi-single'])
+
+# cloud-init
+subprocess.run(['qm', 'set', id, '--ide2', f'{storage}:cloudinit'])
+subprocess.run(['qm', 'set', id, '--ipconfig0', f'ip6={IPV6},ip={IPV4}'])
+subprocess.run(['qm', 'set', id, '--ciuser', username])
+subprocess.run(['qm', 'set', id, '--cipassword', password])
+
+# save SSH key to temp file
+with open('temp_ssh_key.pub', 'w') as f:
+    f.write(ssh_key)
+subprocess.run(['qm', 'set', id, '--sshkey', 'temp_ssh_key.pub'])
+
+# resize disk
+subprocess.run(['qm', 'resize', id, 'scsi0', DISK_SIZE])
+
+# enable qemu-guest-agent
+subprocess.run(['qm', 'set', id, '--agent', 'enabled=1,fstrim_cloned_disks=1'])
+
+# convert to template
+subprocess.run(['qm', 'template', id])
+
+# cleanup
+subprocess.run(['rm', image_name])
+subprocess.run(['rm', 'temp_ssh_key.pub'])
