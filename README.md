@@ -60,9 +60,9 @@ python3 generate.py
    - Enter username (default: root)
    - Enter password (optional)
    - Paste your SSH public key
-   - Select storage location (default: local-lvm)
-   - Enter a unique VM ID
+   - Select storage from the displayed list of available options
    - Choose OS distribution and version
+   - VM ID is automatically assigned (starting at 900)
 
 4. **Wait for completion**: The script will download the image, create the template, and clean up temporary files.
 
@@ -108,21 +108,21 @@ All images are official cloud images provided by the respective distributions an
 
 4. **Storage Selection**
    ```
-   Enter storage (local-lvm): local-lvm
+   Select storage
+
+   1) local-lvm
+   2) local
+   3) local-zfs
+
+   Enter choice: 1
    ```
-   Specify the Proxmox storage where the template will be created. Common options:
-   - `local-lvm` (default, LVM thin)
+   The script displays a list of all available storage pools on your Proxmox system. Select the storage where the template will be created by entering the corresponding number. Common storage types include:
+   - `local-lvm` (LVM thin provisioning)
    - `local` (directory storage)
-   - `local-zfs` (ZFS)
-   - Any other configured storage pool
+   - `local-zfs` (ZFS storage)
+   - Any other configured storage pools
 
-5. **VM ID**
-   ```
-   Enter VM ID: 9000
-   ```
-   Choose a unique VM ID. Template IDs typically use high numbers (9000+) to distinguish them from regular VMs.
-
-6. **OS Selection**
+5. **OS Selection**
    ```
    Select OS
    1) Alpine
@@ -133,7 +133,7 @@ All images are official cloud images provided by the respective distributions an
    ```
    Select your desired operating system from the numbered list.
 
-7. **Version Selection**
+6. **Version Selection**
    ```
    Select Version
    1) 24.04
@@ -142,20 +142,25 @@ All images are official cloud images provided by the respective distributions an
    ```
    Choose the specific version of the selected OS.
 
+### Automatic VM ID Assignment
+
+The script automatically detects the next available VM ID starting from 900. It checks existing VMs and assigns the first unused ID, ensuring no conflicts. This eliminates the need to manually track VM IDs and prevents accidental overwrites.
+
 ### What Happens Next
 
 The script will:
-1. Download the selected cloud image (progress bar shown)
-2. Decompress the image if needed (for `.xz` files)
-3. Create a new VM with the specified ID
-4. Configure VM hardware (CPU, memory, network)
-5. Import the cloud image as the VM's disk
-6. Set up cloud-init configuration
-7. Add your SSH key to the template
-8. Resize the disk to 10GB
-9. Enable QEMU guest agent
-10. Convert the VM to a template
-11. Clean up temporary files
+1. Detect the next available VM ID (starting at 900)
+2. Download the selected cloud image (progress bar shown)
+3. Decompress the image if needed (for `.xz` files)
+4. Create a new VM with the automatically assigned ID
+5. Configure VM hardware (CPU, memory, network)
+6. Import the cloud image as the VM's disk
+7. Set up cloud-init configuration
+8. Add your SSH key to the template
+9. Resize the disk to 10GB
+10. Enable QEMU guest agent
+11. Convert the VM to a template
+12. Clean up temporary files
 
 ## ⚙️ Configuration Options
 
@@ -236,8 +241,8 @@ Once created, you can use the template to create new VMs:
 ### Common Issues and Solutions
 
 #### "VM ID already exists"
-**Problem**: The VM ID you entered is already in use.  
-**Solution**: Choose a different VM ID (unused numbers typically 100+ or 9000+).
+**Problem**: In rare cases, the automatic VM ID detection might fail if a VM is created between the check and template creation.  
+**Solution**: Run the script again. It will automatically detect the next available ID. If the problem persists, you can manually verify available IDs with `qm list`.
 
 #### "Storage not found"
 **Problem**: The specified storage doesn't exist.  
@@ -318,8 +323,18 @@ subprocess.run(['qm', 'set', id, '--scsi1', f'{storage}:32,discard=on'])
 For automated template creation without interactive prompts, you can modify the script or provide inputs via pipe:
 
 ```bash
-echo -e "myuser\nmypass\nssh-rsa AAA...\nlocal-lvm\n9000\n10\n1" | python3 generate.py
+echo -e "myuser\nmypass\nssh-rsa AAA...\n1\n10\n1" | python3 generate.py
 ```
+
+Note: The inputs are now (in order):
+1. Username
+2. Password
+3. SSH key
+4. Storage choice number (e.g., 1 for first storage option)
+5. OS choice number
+6. Version choice number
+
+The VM ID is automatically assigned and no longer needs to be provided.
 
 ### Batch Template Creation
 
@@ -327,9 +342,11 @@ Create a wrapper script to generate multiple templates:
 
 ```bash
 #!/bin/bash
-for id in 9001 9002 9003; do
-    echo "Creating template $id..."
+# IDs are automatically assigned starting at 900
+for os_choice in 1 2 3; do
+    echo "Creating template for OS choice $os_choice..."
     # Run generate.py with different parameters
+    # Each run will get the next available ID automatically
 done
 ```
 
