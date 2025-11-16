@@ -4,7 +4,7 @@
 
 A Python-based tool for automating the creation of cloud-init enabled VM templates in Proxmox VE. This script simplifies the process of downloading official cloud images and converting them into ready-to-use Proxmox templates with cloud-init support.
 
-## ✨ Features
+## Features
 
 - **Automated Template Creation**: Streamlines the process of creating VM templates from cloud images
 - **Automatic VM ID Assignment**: Intelligently detects and assigns the next available VM ID (starting at 900)
@@ -17,7 +17,7 @@ A Python-based tool for automating the creation of cloud-init enabled VM templat
 - **Disk Optimization**: Includes discard support for efficient storage usage
 - **Automatic Cleanup**: Removes temporary files after template creation
 
-## 🔧 Prerequisites
+## Prerequisites
 
 Before using this tool, ensure you have:
 
@@ -32,7 +32,7 @@ Before using this tool, ensure you have:
 
 The script uses Proxmox's `qm` command-line tool, which is installed by default on Proxmox VE.
 
-## 🚀 Quick Start
+## Quick Start
 
 1. **SSH into your Proxmox node** (or use the web console)
 
@@ -53,7 +53,7 @@ python3 generate.py
 
 4. **Wait for completion**: The script will download the image, create the template, and clean up temporary files.
 
-## 📦 Supported Images
+## Supported Images
 
 The script supports the following operating systems and versions:
 
@@ -71,7 +71,7 @@ The script supports the following operating systems and versions:
 
 All images are official cloud images provided by the respective distributions and are optimized for cloud/virtualization environments.
 
-## 📖 Detailed Usage
+## Detailed Usage
 
 ### Step-by-Step Guide
 
@@ -149,7 +149,7 @@ The script will:
 11. Convert the VM to a template
 12. Clean up temporary files
 
-## ⚙️ Configuration Options
+## Configuration Options
 
 ### Template Name Format
 
@@ -179,7 +179,7 @@ The script creates templates with the following specifications:
 - **Network Config**: DHCP for IPv4, auto for IPv6
 - **Guest Agent**: Enabled with fstrim for cloned disks
 
-## 📝 Template Specifications
+## Template Specifications
 
 ### VM Hardware Configuration
 
@@ -223,7 +223,7 @@ Once created, you can use the template to create new VMs:
    - Resize disk: `qm resize <vm-id> scsi0 +10G`
    - Configure cloud-init in the Proxmox UI or via CLI
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Common Issues and Solutions
 
@@ -280,7 +280,7 @@ Check Proxmox logs for detailed information:
 tail -f /var/log/pve/tasks/active
 ```
 
-## 🎯 Advanced Usage
+## Advanced Usage
 
 ### Customizing Template Specifications
 
@@ -359,7 +359,7 @@ The script can be integrated into automation tools:
 - **Terraform**: Use `null_resource` with local-exec provisioner
 - **Packer**: Create custom Packer builders using this script
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Here's how you can help:
 
@@ -380,20 +380,7 @@ Contributions are welcome! Here's how you can help:
 - Update documentation for new features
 - Ensure backward compatibility when possible
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-### MIT License Summary
-
-- ✅ Commercial use
-- ✅ Modification
-- ✅ Distribution
-- ✅ Private use
-- ❌ Liability
-- ❌ Warranty
-
-## 🙏 Credits
+## Credits
 
 - **Original Concept**: Based on [this project](https://www.apalrd.net/posts/2023/pve_cloud/) by apalrd
 - **Cloud Images**: Provided by respective Linux distributions
@@ -403,10 +390,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Note**: This is an unofficial tool and is not affiliated with or endorsed by Proxmox Server Solutions GmbH or any of the Linux distributions mentioned.
 
-## 📞 Support
+## Support
 
 - **Issues**: [GitHub Issues](https://github.com/rothdennis/Proxmox-Templates/issues)
-- **Discussions**: Use GitHub Discussions for questions and ideas
 - **Pull Requests**: Contributions welcome!
 
 ---
