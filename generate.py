@@ -3,6 +3,8 @@ import lzma
 import shutil
 import sys
 import subprocess
+import tempfile
+import os
 from getpass import getpass
 
 ### CONSTANTS ###
@@ -88,45 +90,122 @@ def show_progress(block_num, block_size, total_size):
         sys.stdout.write(f"\rDownloaded {downloaded} bytes")
         sys.stdout.flush()
 
+def is_valid_ssh_public_key(key: str) -> bool:
+    with tempfile.NamedTemporaryFile("w", delete=False) as f:
+        f.write(key)
+        filename = f.name
+
+    result = subprocess.run(
+        ["ssh-keygen", "-lf", filename],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+    
+    # Clean up the temp file
+    try:
+        os.remove(filename)
+    except:
+        pass
+    
+    return result.returncode == 0
+
 ### INPUTS ###
 
+### CLEAR SCREEN ###
+subprocess.run('clear', shell=True)
+
+### SET USERNAME ###
 username = input('Enter username (root): ') or 'root'
 print('\n-----\n')
-password = getpass('Enter password: ') or ''
+
+### SET PASSWORD ###
+password = ''
+while True:
+    password = getpass('Enter password: ')
+    if password:
+        break
+    else:
+        print('Password cannot be empty. Please try again.\n')
 print('\n-----\n')
-ssh_key = input('Enter SSH key: ')
+password_confirm = ''
+while True:
+    password_confirm = getpass('Confirm password: ') or ''
+    if password == password_confirm:
+        break
+    else:
+        print('Passwords do not match. Please try again.\n')
 print('\n-----\n')
+
+### SET SSH KEY ###
+ssh_key = ''
+while True:
+    ssh_key = input('Enter SSH key: ')
+    if is_valid_ssh_public_key(ssh_key):
+        break
+    else:
+        print('Invalid SSH public key. Please try again.\n')
+print('\n-----\n')
+
+### SELECT STORAGE ###
 res = subprocess.run("pvesm status | awk 'NR>1 {print $1}'", capture_output=True, text=True, shell=True)
 available_storages = res.stdout.strip().split('\n')
 print('Select storage\n')
 for i, storage in enumerate(available_storages):
     print(f'{i+1}) {storage}')
-storage_choice = int(input('\nEnter choice: ')) - 1
+storage_choice = 0
+while True:
+    try:
+        storage_choice = int(input('\nEnter choice: ')) - 1
+        if 0 <= storage_choice < len(available_storages):
+            break
+        else:
+            print('Invalid choice. Please try again.\n')
+    except ValueError:
+        print('Invalid input. Please enter a number.\n')
 storage = available_storages[storage_choice]
 print('\n-----\n')
-res = subprocess.run("qm list | awk 'NR>1 {print $1}'", capture_output=True, text=True, shell=True)
-used_ids = set(map(int, res.stdout.strip().split('\n')))
-while ID_START in used_ids:
-    ID_START += 1
-id = str(ID_START)
-# id= input('Enter VM ID: ')
-# print('\n-----\n')
 
+### SELECT OS ###
 print('Select OS\n')
 for i, disto in enumerate(IMAGES):
     print(f'{i+1}) {disto}')
-distro_choice = int(input('\nEnter choice: ')) - 1
-
+distro_choice = 0
+while True:
+    try:
+        distro_choice = int(input('\nEnter choice: ')) - 1
+        if 0 <= distro_choice < len(IMAGES):
+            break
+        else:
+            print('Invalid choice. Please try again.\n')
+    except ValueError:
+        print('Invalid input. Please enter a number.\n')
 print('\n-----\n')
 
+### SELECT OS VERSION ###
 print('Select Version\n')
 distro_name = list(IMAGES.keys())[distro_choice]
 for i, version in enumerate(IMAGES[distro_name]):
     version_name = list(version.keys())[0]
     print(f'{i+1}) {version_name}')
-version_choice = int(input('\nEnter choice: ')) - 1
-
+version_choice = 0
+while True:
+    try:
+        version_choice = int(input('\nEnter choice: ')) - 1
+        if 0 <= version_choice < len(IMAGES[distro_name]):
+            break
+        else:
+            print('Invalid choice. Please try again.\n')
+    except ValueError:
+        print('Invalid input. Please enter a number.\n')
 print('\n-----\n')
+
+### GENERATE UNIQUE ID ###
+res = subprocess.run("qm list | awk 'NR>1 {print $1}'", capture_output=True, text=True, shell=True)
+used_ids = set(map(int, res.stdout.strip().split('\n')))
+while ID_START in used_ids:
+    ID_START += 1
+id = str(ID_START)
 
 ### DOWNLOAD IMAGE ###
 image_url = list(IMAGES[distro_name][version_choice].values())[0]
