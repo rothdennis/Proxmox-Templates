@@ -40,6 +40,12 @@ The script uses Proxmox's `qm` command-line tool, which is installed by default 
 
 2. **Download and run the script**:
 
+One-liner:
+```
+python3 <(curl -s https://raw.githubusercontent.com/rothdennis/Proxmox-Templates/main/generate.py)
+```
+
+or Two-liner:
 ```bash
 wget https://raw.githubusercontent.com/rothdennis/Proxmox-Templates/main/generate.py
 python3 generate.py
