@@ -145,15 +145,6 @@ Contributions welcome! Please:
 - Based on [this project](https://www.apalrd.net/posts/2023/pve_cloud/) by apalrd
 - Cloud images provided by respective Linux distributions
 
-## License
-
-MIT License - see LICENSE file for details
-
-## Support
-
-- **Issues:** [GitHub Issues](https://github.com/rothdennis/Proxmox-Templates/issues)
-- **Documentation:** [Anthropic API Docs](https://docs.claude.com)
-
 ---
 
 **Note:** Unofficial tool, not affiliated with Proxmox Server Solutions GmbH or any Linux distributions.
