@@ -49,6 +49,9 @@ IMAGES = {
     'Fedora':[
         {'Cloud 43': 'https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2'},
     ],
+    'Kali Linux':[
+        {'Latest': 'https://kali.download/cloud-images/kali-2025.3/kali-linux-2025.3-cloud-genericcloud-amd64.tar.xz'},
+    ],
     'openSUSE':[
         {'Tumbleweed':'https://download.opensuse.org/tumbleweed/appliances/openSUSE-Tumbleweed-Minimal-VM.x86_64-Cloud.qcow2'},
     ],
@@ -135,8 +138,22 @@ print('\n-----\n')
 
 ### DECOMPRESS IMAGE IF NEEDED ###
 
-if image_name.endswith('.xz'):
-    decompressed_name = image_name[:-3]
+if image_name.endswith('.tar.xz'):
+    print(f'Decompressing {image_name} ...')
+    with lzma.open(image_name) as f_in:
+        with open('temp.tar', 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+    # List contents of tar to find the actual filename
+    result = subprocess.run(['tar', '-tf', 'temp.tar'], capture_output=True, text=True)
+    extracted_files = result.stdout.strip().split('\n')
+    # Find the disk image file (typically .raw, .qcow2, or .img)
+    disk_file = next((f for f in extracted_files if f.endswith(('.raw', '.qcow2', '.img'))), extracted_files[0])
+    subprocess.run(['tar', '-xf', 'temp.tar'])
+    subprocess.run(['rm', 'temp.tar'])
+    subprocess.run(['rm', image_name])
+    image_name = disk_file
+elif image_name.endswith('.xz'):
+    decompressed_name = image_name[:-3] # remove .xz
     print(f'Decompressing {image_name} to {decompressed_name} ...')
     with lzma.open(image_name) as f_in:
         with open(decompressed_name, 'wb') as f_out:
@@ -162,7 +179,8 @@ subprocess.run(['qm', 'set', id, '--net0', f'virtio,bridge={NETWORK_BRIDGE}'])
 subprocess.run(['qm', 'set', id, '--memory', str(MEMORY), '--cores', str(CORES), '--sockets', str(SOCKETS), '--cpu', CPU])
 
 # import disk
-subprocess.run(['qm', 'importdisk', id, image_name, storage])
+format = 'qcow2' if image_name.endswith('.qcow2') or image_name.endswith('.img') else 'raw'
+subprocess.run(['qm', 'importdisk', id, image_name, storage, '--format', format])
 subprocess.run(['qm', 'set', id, '--scsi0', f'{storage}:vm-{id}-disk-0,discard=on'])
 subprocess.run(['qm', 'set', id, '--boot', 'order=scsi0', '--scsihw', 'virtio-scsi-single'])
 
