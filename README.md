@@ -4,6 +4,8 @@
 
 A Python-based tool for automating the creation of cloud-init enabled VM templates in Proxmox VE. This script simplifies the process of downloading official cloud images and converting them into ready-to-use Proxmox templates with cloud-init support.
 
+![Proxmox Templates Screenshot](img/screenshot1.png)
+
 ## Features
 
 - **Automated Template Creation**: Streamlines the process of creating VM templates from cloud images
@@ -66,6 +68,7 @@ The script supports the following operating systems and versions:
 | **CentOS Stream** | 10, 9 |
 | **Debian** | 13 (Trixie), 12 (Bookworm) |
 | **Fedora** | Cloud 43 |
+| **Kali Linux** | 2025.3 |
 | **openSUSE** | Tumbleweed |
 | **Oracle Linux** | 10.0, 9.6, 8.10, 7.9 |
 | **Rocky Linux** | 10, 9, 8 |
