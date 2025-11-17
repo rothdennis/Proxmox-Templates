@@ -66,7 +66,7 @@ The script supports the following operating systems and versions:
 | **CentOS Stream** | 10, 9 |
 | **Debian** | 13 (Trixie), 12 (Bookworm) |
 | **Fedora** | Cloud 43 |
-| **Kali Linux** | Latest |
+| **Kali Linux** | 2025.3 |
 | **openSUSE** | Tumbleweed |
 | **Oracle Linux** | 10.0, 9.6, 8.10, 7.9 |
 | **Rocky Linux** | 10, 9, 8 |
