@@ -52,20 +52,20 @@ The script automatically assigns the next available VM ID starting at 900.
 
 ## Supported Operating Systems
 
-| OS | Versions |
-|:---|:---------|
-| **Alpine** | 3.22, 3.21, 3.20 |
-| **Alma Linux** | 10, 9, 8 |
-| **Amazon Linux** | 2023, 2 |
-| **Arch Linux** | Latest |
-| **CentOS Stream** | 10, 9 |
-| **Debian** | 13 (Trixie), 12 (Bookworm) |
-| **Fedora** | Cloud 43 |
-| **Kali Linux** | 2025.3 |
-| **openSUSE** | Tumbleweed |
-| **Oracle Linux** | 10.0, 9.6, 8.10, 7.9 |
-| **Rocky Linux** | 10, 9, 8 |
-| **Ubuntu** | 25.10, 25.04, 24.04 LTS, 22.04 LTS |
+| OS | Versions |Images|
+|:---|:--|:--|
+| [**Alpine**](https://alpinelinux.org/) | 3.22, 3.21, 3.20 | [Link](https://alpinelinux.org/cloud/) |
+| [**Alma Linux**](https://almalinux.org/) | 10, 9, 8 | [Link](https://almalinux.org/get-almalinux/#Cloud_Images) |
+| [**Amazon Linux**](https://aws.amazon.com/de/linux/) | 2023<br>2 | [Link](https://cdn.amazonlinux.com/al2023/os-images/latest/)<br>[Link](https://cdn.amazonlinux.com/os-images/latest/)  |
+| [**Arch Linux**](https://archlinux.org/) | Latest | [Link](https://mirror.pkgbuild.com/images/latest/) |
+| [**CentOS Stream**](https://www.centos.org/) | 10, 9 | [Link](https://cloud.centos.org/centos/) |
+| [**Debian**](https://www.debian.org/) | 13 (Trixie), 12 (Bookworm) | [Link](https://cloud.debian.org/images/cloud/) |
+| [**Fedora**](https://getfedora.org/) | Cloud 43 | [Link](https://fedoraproject.org/cloud/download) |
+| [**Kali Linux**](https://www.kali.org/) | 2025.3 | [Link](https://www.kali.org/get-kali/#kali-cloud) |
+| [**openSUSE**](https://www.opensuse.org/) | Tumbleweed | [Link](https://get.opensuse.org/tumbleweed/?type=server#download) |
+| [**Oracle Linux**](https://www.oracle.com/linux/) | 10.0, 9.6, 8.10, 7.9 | [Link](https://yum.oracle.com/oracle-linux-templates.html) |
+| [**Rocky Linux**](https://rockylinux.org/) | 10, 9, 8 | [Link](https://rockylinux.org/download) |
+| [**Ubuntu**](https://ubuntu.com/) | 25.10, 25.04, 24.04 LTS, 22.04 LTS | [Link](https://cloud-images.ubuntu.com/) |
 
 ## Template Specifications
 
