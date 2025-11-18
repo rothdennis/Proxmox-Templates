@@ -52,20 +52,20 @@ The script automatically assigns the next available VM ID starting at 900.
 
 ## Supported Operating Systems
 
-| OS | Versions |
-|:---|:---------|
-| **Alpine** | 3.22, 3.21, 3.20 |
-| **Alma Linux** | 10, 9, 8 |
-| **Amazon Linux** | 2023, 2 |
-| **Arch Linux** | Latest |
-| **CentOS Stream** | 10, 9 |
-| **Debian** | 13 (Trixie), 12 (Bookworm) |
-| **Fedora** | Cloud 43 |
-| **Kali Linux** | 2025.3 |
-| **openSUSE** | Tumbleweed |
-| **Oracle Linux** | 10.0, 9.6, 8.10, 7.9 |
-| **Rocky Linux** | 10, 9, 8 |
-| **Ubuntu** | 25.10, 25.04, 24.04 LTS, 22.04 LTS |
+| OS | Versions |Images|
+|:---|:--|:--|
+| [**Alpine**](https://alpinelinux.org/) | 3.22, 3.21, 3.20 | [Link](https://alpinelinux.org/cloud/) |
+| [**Alma Linux**](https://almalinux.org/) | 10, 9, 8 | [Link](https://almalinux.org/get-almalinux/#Cloud_Images) |
+| [**Amazon Linux**](https://aws.amazon.com/de/linux/) | 2023<br>2 | [Link](https://cdn.amazonlinux.com/al2023/os-images/latest/)<br>[Link](https://cdn.amazonlinux.com/os-images/latest/)  |
+| [**Arch Linux**](https://archlinux.org/) | Latest | [Link](https://mirror.pkgbuild.com/images/latest/) |
+| [**CentOS Stream**](https://www.centos.org/) | 10, 9 | [Link](https://cloud.centos.org/centos/) |
+| [**Debian**](https://www.debian.org/) | 13 (Trixie), 12 (Bookworm) | [Link](https://cloud.debian.org/images/cloud/) |
+| [**Fedora**](https://getfedora.org/) | Cloud 43 | [Link](https://fedoraproject.org/cloud/download) |
+| [**Kali Linux**](https://www.kali.org/) | 2025.3 | [Link](https://www.kali.org/get-kali/#kali-cloud) |
+| [**openSUSE**](https://www.opensuse.org/) | Tumbleweed | [Link](https://get.opensuse.org/tumbleweed/?type=server#download) |
+| [**Oracle Linux**](https://www.oracle.com/linux/) | 10.0, 9.6, 8.10, 7.9 | [Link](https://yum.oracle.com/oracle-linux-templates.html) |
+| [**Rocky Linux**](https://rockylinux.org/) | 10, 9, 8 | [Link](https://rockylinux.org/download) |
+| [**Ubuntu**](https://ubuntu.com/) | 25.10, 25.04, 24.04 LTS, 22.04 LTS | [Link](https://cloud-images.ubuntu.com/) |
 
 ## Template Specifications
 
@@ -97,15 +97,28 @@ qm resize <vm-id> scsi0 +10G
 
 ## Customizing Defaults
 
-Edit these constants at the top of `generate.py`:
+To change default settings you can modify the script parameters:
 
-```python
-MEMORY = 2048              # Change memory (default: 1024)
-CORES = 4                  # Change CPU cores (default: 2)
-DISK_SIZE = '20G'          # Change disk size (default: '10G')
-NETWORK_BRIDGE = 'vmbr1'   # Change network bridge (default: 'vmbr0')
-PREFIX = 'my-template'     # Change template name prefix (default: 'template')
-ID_START = 1000            # Change starting VM ID (default: 900)
+```bash
+# python3 generate.py --help
+usage: Proxmox VM Template Generator [-h] [--memory MEMORY] [--cores CORES] [--sockets SOCKETS] [--disk-size DISK_SIZE] [--cpu CPU] [--network-bridge NETWORK_BRIDGE] [--ipv4 IPV4] [--ipv6 IPV6] [--prefix PREFIX] [--id-start ID_START]
+
+Generate Proxmox VM templates from cloud images with custom configurations.
+
+options:
+  -h, --help            show this help message and exit
+  --memory MEMORY       set the memory size in MB (default: 1024)
+  --cores CORES         set the number of CPU cores (default: 2)
+  --sockets SOCKETS     set the number of CPU sockets (default: 1)
+  --disk-size DISK_SIZE
+                        set the disk size (default: 10G)
+  --cpu CPU             set the CPU type (default: host)
+  --network-bridge NETWORK_BRIDGE
+                        set the network bridge (default: vmbr0)
+  --ipv4 IPV4           set the IPv4 configuration (default: dhcp)
+  --ipv6 IPV6           set the IPv6 configuration (default: auto)
+  --prefix PREFIX       set the prefix for VM template names (default: template)
+  --id-start ID_START   set the starting ID for VM templates (default: 900)
 ```
 
 ## Troubleshooting

@@ -6,19 +6,41 @@ import subprocess
 import tempfile
 import os
 from getpass import getpass
+import argparse
+
+### ARGUMENTS ###
+
+parser = argparse.ArgumentParser(
+                    prog='Proxmox VM Template Generator',
+                    description='Generate Proxmox VM templates from cloud images with custom configurations.')
+# hardware
+parser.add_argument('--memory', type=int, default=1024, help='set the memory size in MB (default: 1024)')
+parser.add_argument('--cores', type=int, default=2, help='set the number of CPU cores (default: 2)')
+parser.add_argument('--sockets', type=int, default=1, help='set the number of CPU sockets (default: 1)')
+parser.add_argument('--disk-size', type=str, default='10G', help='set the disk size (default: 10G)')
+parser.add_argument('--cpu', type=str, default='host', help='set the CPU type (default: host)')
+# network
+parser.add_argument('--network-bridge', type=str, default='vmbr0', help='set the network bridge (default: vmbr0)')
+parser.add_argument('--ipv4', type=str, default='dhcp', help='set the IPv4 configuration (default: dhcp)')
+parser.add_argument('--ipv6', type=str, default='auto', help='set the IPv6 configuration (default: auto)')
+# naming and IDs
+parser.add_argument('--prefix', type=str, default='template', help='set the prefix for VM template names (default: template)')
+parser.add_argument('--id-start', type=int, default=900, help='set the starting ID for VM templates (default: 900)')
+
+args = parser.parse_args()
 
 ### CONSTANTS ###
 
-MEMORY = 1024
-CORES = 2
-SOCKETS = 1
+MEMORY = args.memory
+CORES = args.cores
+SOCKETS = args.sockets
 CPU = 'host'
-DISK_SIZE = '10G'
-NETWORK_BRIDGE = 'vmbr0'
-IPV6 = 'auto'
-IPV4 = 'dhcp'
-PREFIX='template'
-ID_START=900
+DISK_SIZE = args.disk_size
+NETWORK_BRIDGE = args.network_bridge
+IPV6 = args.ipv6
+IPV4 = args.ipv4
+PREFIX = args.prefix
+ID_START = args.id_start
 
 ### IMAGES ###
 
@@ -116,7 +138,7 @@ def is_valid_ssh_public_key(key: str) -> bool:
 subprocess.run('clear', shell=True)
 
 ### SET USERNAME ###
-username = input('Enter username (root): ') or 'root'
+username = input('Enter username [root]: ') or 'root'
 print('\n-----\n')
 
 ### SET PASSWORD ###
