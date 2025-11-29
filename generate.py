@@ -277,14 +277,19 @@ print(f'Generating template ...')
 # create VM
 subprocess.run(['qm', 'create', id, '--name', name, '--ostype', 'l26'])
 subprocess.run(['qm', 'set', id, '--net0', f'virtio,bridge={NETWORK_BRIDGE}'])
-subprocess.run(['qm', 'set', id, '--memory', str(MEMORY), '--cores', str(CORES), '--sockets', str(SOCKETS), '--cpu', CPU])
-subprocess.run(['qm', 'set', id, '--serial0', 'socket', '--vga', 'serial0'])
+subprocess.run(['qm', 'set', id, '--memory', str(MEMORY)])
+subprocess.run(['qm', 'set', id, '--cores', str(CORES)])
+subprocess.run(['qm', 'set', id, '--sockets', str(SOCKETS)])
+subprocess.run(['qm', 'set', id, '--cpu', CPU])
+subprocess.run(['qm', 'set', id, '--serial0', 'socket'])
+subprocess.run(['qm', 'set', id, '--vga', 'std'])
 
 # import disk
 format = 'qcow2' if image_name.endswith('.qcow2') or image_name.endswith('.img') else 'raw'
 subprocess.run(['qm', 'importdisk', id, image_name, storage, '--format', format])
 subprocess.run(['qm', 'set', id, '--scsi0', f'{storage}:vm-{id}-disk-0,discard=on'])
-subprocess.run(['qm', 'set', id, '--boot', 'order=scsi0', '--scsihw', 'virtio-scsi-single'])
+subprocess.run(['qm', 'set', id, '--boot', 'order=scsi0'])
+subprocess.run(['qm', 'set', id, '--scsihw', 'virtio-scsi-single'])
 
 # cloud-init
 subprocess.run(['qm', 'set', id, '--ide2', f'{storage}:cloudinit'])
