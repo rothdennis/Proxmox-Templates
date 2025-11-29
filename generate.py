@@ -278,6 +278,7 @@ print(f'Generating template ...')
 subprocess.run(['qm', 'create', id, '--name', name, '--ostype', 'l26'])
 subprocess.run(['qm', 'set', id, '--net0', f'virtio,bridge={NETWORK_BRIDGE}'])
 subprocess.run(['qm', 'set', id, '--memory', str(MEMORY), '--cores', str(CORES), '--sockets', str(SOCKETS), '--cpu', CPU])
+subprocess.run(['qm', 'set', id, '--serial0', 'socket', '--vga', 'serial0'])
 
 # import disk
 format = 'qcow2' if image_name.endswith('.qcow2') or image_name.endswith('.img') else 'raw'
