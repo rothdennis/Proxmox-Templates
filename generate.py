@@ -157,7 +157,7 @@ def get_ssh_key():
     return ssh_key
 
 def select_storage():
-    res = subprocess.run("pvesm status | awk 'NR>1 {print $1}'", capture_output=True, text=True, shell=True)
+    res = subprocess.run("pvesm status --content images | awk 'NR>1 {print $1}'", capture_output=True, text=True, shell=True)
     available_storages = res.stdout.strip().split('\n')
     print('Select storage\n')
     for i, storage in enumerate(available_storages):
@@ -206,18 +206,31 @@ def get_cloud_init_files():
         # Validate storage name contains only allowed characters (alphanumeric, dash, underscore)
         if not storage or not all(c.isalnum() or c in '-_' for c in storage):
             continue
-        
-        # Get the path for this storage using list form to avoid shell injection
-        res = subprocess.run(['pvesm', 'path', f'{storage}:snippets/'], 
-                           capture_output=True, text=True)
-        storage_path = res.stdout.strip()
-        
-        # Validate storage_path is an absolute path and exists
-        if not storage_path or not os.path.isabs(storage_path) or not os.path.isdir(storage_path):
+
+        # Get the storage path using pvesm status --storage <storage>
+        res = subprocess.run(['pvesm', 'status', '--storage', storage], capture_output=True, text=True)
+        lines = res.stdout.strip().split('\n')
+        print(lines)
+        storage_path = None
+        for line in lines:
+            if line.startswith(storage):
+                # Try to find the path column (for CIFS/dir)
+                parts = line.split()
+                for part in parts:
+                    if part.startswith('/'):
+                        storage_path = part
+                        break
+                if storage_path:
+                    break
+
+        if not storage_path or not os.path.isabs(storage_path):
             continue
-        
-        # Find all yaml/yml files in the snippets directory
-        for filename in os.listdir(storage_path):
+
+        snippets_dir = os.path.join(storage_path, 'snippets')
+        if not os.path.isdir(snippets_dir):
+            continue
+
+        for filename in os.listdir(snippets_dir):
             # Validate filename contains no path separators
             if os.sep in filename or (os.altsep and os.altsep in filename):
                 continue
@@ -225,7 +238,7 @@ def get_cloud_init_files():
                 # Format: storage:snippets/filename.yaml
                 volume_path = f"{storage}:snippets/{filename}"
                 cloud_init_files.append(volume_path)
-    
+
     return cloud_init_files
 
 def select_cloud_init_method():
@@ -253,6 +266,34 @@ def select_cloud_init_file():
     
     if not cloud_init_files:
         print('No cloud-init files found in snippet-enabled storage pools.')
+        # Show which snippet directories were checked
+        checked_dirs = []
+        snippet_storages = get_snippet_storages()
+        for storage in snippet_storages:
+            res = subprocess.run(['pvesm', 'status', '--storage', storage], capture_output=True, text=True)
+            lines = res.stdout.strip().split('\n')
+            storage_path = None
+            for line in lines:
+                if line.startswith(storage):
+                    parts = line.split()
+                    for part in parts:
+                        if part.startswith('/'):
+                            storage_path = part
+                            break
+                    if storage_path:
+                        break
+            if storage_path and os.path.isabs(storage_path):
+                snippets_dir = os.path.join(storage_path, 'snippets')
+                checked_dirs.append(snippets_dir)
+        if checked_dirs:
+            print('Checked the following snippet directories:')
+            for d in checked_dirs:
+                print(f'  {d}')
+            print('To add a sample file, run:')
+            print('  touch <directory>/my-cloud-init.yaml')
+            print('  # Or copy your cloud-init YAML file to one of the above directories.')
+        else:
+            print('No snippet-enabled storage directories found.')
         print('Please add yaml/yml files to a storage pool that supports snippets.')
         sys.exit(1)
     
