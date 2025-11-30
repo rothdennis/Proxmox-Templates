@@ -1,3 +1,5 @@
 *.qcow2
 *.xz
 *.img
+cloud-init.yaml
+__pycache__/

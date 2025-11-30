@@ -42,11 +42,10 @@ python3 generate.py
 ```
 
 Follow the interactive prompts to:
-1. Enter username (default: root)
-2. Set password
-3. Paste SSH public key
-4. Select storage pool
-5. Choose OS and version
+1. Choose cloud-init method (manual credentials or cloud-init file)
+2. Enter credentials manually OR select a cloud-init file from snippet storage
+3. Select storage pool
+4. Choose OS and version
 
 The script automatically assigns the next available VM ID starting at 900.
 
@@ -119,6 +118,30 @@ options:
   --ipv6 IPV6           set the IPv6 configuration (default: auto)
   --prefix PREFIX       set the prefix for VM template names (default: template)
   --id-start ID_START   set the starting ID for VM templates (default: 900)
+```
+
+### Using a Custom Cloud-Init File
+
+When running the script, you will be prompted to choose between:
+1. **Enter credentials manually** - Enter username, password, and SSH key interactively
+2. **Use a cloud-init file** - Select from available cloud-init files in snippet-enabled storage pools
+
+If you choose to use a cloud-init file, the script will list all `.yaml` and `.yml` files found in the snippets directory of storage pools that support the `snippets` content type. Files are displayed in the Proxmox volume format (e.g., `local:snippets/userconfig.yaml`).
+
+To add cloud-init files for selection:
+1. Ensure you have a storage pool with `snippets` content type enabled
+2. Place your cloud-init YAML files in the storage's snippets directory
+3. Run the script and select option 2 to choose from available files
+
+Example cloud-init user-data file:
+
+```yaml
+#cloud-config
+users:
+  - name: myuser
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ssh-rsa AAAA...your-public-key...
 ```
 
 ## Troubleshooting
