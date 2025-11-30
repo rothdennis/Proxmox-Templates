@@ -115,6 +115,8 @@ def parse_arguments():
     # naming and IDs
     parser.add_argument('--prefix', type=str, default='template', help='set the prefix for VM template names (default: template)')
     parser.add_argument('--id-start', type=int, default=900, help='set the starting ID for VM templates (default: 900)')
+    # cloud-init
+    parser.add_argument('--cloud-init', type=str, default=None, help='path to a cloud-init user-data file. When provided, skips username, password and SSH key prompts and uses --cicustom instead')
     
     return parser.parse_args()
 
@@ -270,7 +272,7 @@ def generate_template_name(distro_name, version_choice, prefix):
     os_version = list(IMAGES[distro_name][version_choice].keys())[0].lower().replace(' ', '-').replace('.', '-')
     return f'{prefix}-{os_name}-{os_version}'
 
-def create_template(vm_id, name, image_name, storage, username, password, ssh_key, config):
+def create_template(vm_id, name, image_name, storage, username, password, ssh_key, config, cloud_init_file=None):
     print(f'Generating template ...')
 
     # create VM
@@ -293,13 +295,19 @@ def create_template(vm_id, name, image_name, storage, username, password, ssh_ke
     # cloud-init
     subprocess.run(['qm', 'set', vm_id, '--ide2', f'{storage}:cloudinit'])
     subprocess.run(['qm', 'set', vm_id, '--ipconfig0', f"ip6={config['ipv6']},ip={config['ipv4']}"])
-    subprocess.run(['qm', 'set', vm_id, '--ciuser', username])
-    subprocess.run(['qm', 'set', vm_id, '--cipassword', password])
+    
+    if cloud_init_file:
+        # Use custom cloud-init file
+        subprocess.run(['qm', 'set', vm_id, '--cicustom', f'user={cloud_init_file}'])
+    else:
+        # Use interactive credentials
+        subprocess.run(['qm', 'set', vm_id, '--ciuser', username])
+        subprocess.run(['qm', 'set', vm_id, '--cipassword', password])
 
-    # save SSH key to temp file
-    with open('temp_ssh_key.pub', 'w') as f:
-        f.write(ssh_key)
-    subprocess.run(['qm', 'set', vm_id, '--sshkey', 'temp_ssh_key.pub'])
+        # save SSH key to temp file
+        with open('temp_ssh_key.pub', 'w') as f:
+            f.write(ssh_key)
+        subprocess.run(['qm', 'set', vm_id, '--sshkey', 'temp_ssh_key.pub'])
 
     # resize disk
     subprocess.run(['qm', 'resize', vm_id, 'scsi0', config['disk_size']])
@@ -316,7 +324,8 @@ def create_template(vm_id, name, image_name, storage, username, password, ssh_ke
 
     # cleanup
     subprocess.run(['rm', image_name])
-    subprocess.run(['rm', 'temp_ssh_key.pub'])
+    if not cloud_init_file:
+        subprocess.run(['rm', 'temp_ssh_key.pub'])
 
 def main():
     args = parse_arguments()
@@ -334,11 +343,27 @@ def main():
         'id_start': args.id_start,
     }
     
+    cloud_init_file = args.cloud_init
+    
+    # Validate cloud-init file if provided
+    if cloud_init_file and not os.path.isfile(cloud_init_file):
+        print(f'Error: Cloud-init file not found: {cloud_init_file}')
+        sys.exit(1)
+    
     clear_screen()
     
-    username = get_username()
-    password = get_password()
-    ssh_key = get_ssh_key()
+    # Skip username, password, and SSH key prompts if cloud-init file is provided
+    if cloud_init_file:
+        print(f'Using cloud-init file: {cloud_init_file}')
+        print('\n-----\n')
+        username = None
+        password = None
+        ssh_key = None
+    else:
+        username = get_username()
+        password = get_password()
+        ssh_key = get_ssh_key()
+    
     storage = select_storage()
     distro_name = select_os()
     version_choice = select_version(distro_name)
@@ -351,7 +376,7 @@ def main():
     
     name = generate_template_name(distro_name, version_choice, config['prefix'])
     
-    create_template(vm_id, name, image_name, storage, username, password, ssh_key, config)
+    create_template(vm_id, name, image_name, storage, username, password, ssh_key, config, cloud_init_file)
 
 
 if __name__ == '__main__':
