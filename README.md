@@ -42,11 +42,10 @@ python3 generate.py
 ```
 
 Follow the interactive prompts to:
-1. Enter username (default: root)
-2. Set password
-3. Paste SSH public key
-4. Select storage pool
-5. Choose OS and version
+1. Choose cloud-init method (manual credentials or cloud-init file)
+2. Enter credentials manually OR select a cloud-init file from snippet storage
+3. Select storage pool
+4. Choose OS and version
 
 The script automatically assigns the next available VM ID starting at 900.
 
@@ -101,7 +100,7 @@ To change default settings you can modify the script parameters:
 
 ```bash
 # python3 generate.py --help
-usage: Proxmox VM Template Generator [-h] [--memory MEMORY] [--cores CORES] [--sockets SOCKETS] [--disk-size DISK_SIZE] [--cpu CPU] [--network-bridge NETWORK_BRIDGE] [--ipv4 IPV4] [--ipv6 IPV6] [--prefix PREFIX] [--id-start ID_START] [--cloud-init CLOUD_INIT]
+usage: Proxmox VM Template Generator [-h] [--memory MEMORY] [--cores CORES] [--sockets SOCKETS] [--disk-size DISK_SIZE] [--cpu CPU] [--network-bridge NETWORK_BRIDGE] [--ipv4 IPV4] [--ipv6 IPV6] [--prefix PREFIX] [--id-start ID_START]
 
 Generate Proxmox VM templates from cloud images with custom configurations.
 
@@ -119,20 +118,22 @@ options:
   --ipv6 IPV6           set the IPv6 configuration (default: auto)
   --prefix PREFIX       set the prefix for VM template names (default: template)
   --id-start ID_START   set the starting ID for VM templates (default: 900)
-  --cloud-init CLOUD_INIT
-                        path to a cloud-init user-data file. When provided, skips
-                        username, password and SSH key prompts and uses --cicustom instead
 ```
 
 ### Using a Custom Cloud-Init File
 
-Instead of entering username, password, and SSH key interactively, you can provide a custom cloud-init user-data file:
+When running the script, you will be prompted to choose between:
+1. **Enter credentials manually** - Enter username, password, and SSH key interactively
+2. **Use a cloud-init file** - Select from available cloud-init files in snippet-enabled storage pools
 
-```bash
-python3 generate.py --cloud-init /path/to/user-data.yaml
-```
+If you choose to use a cloud-init file, the script will list all `.yaml` and `.yml` files found in the snippets directory of storage pools that support the `snippets` content type. Files are displayed in the Proxmox volume format (e.g., `local:snippets/userconfig.yaml`).
 
-This will skip the credential prompts and use `qm set --cicustom user=<file>` to configure cloud-init from your file. Example cloud-init user-data file:
+To add cloud-init files for selection:
+1. Ensure you have a storage pool with `snippets` content type enabled
+2. Place your cloud-init YAML files in the storage's snippets directory
+3. Run the script and select option 2 to choose from available files
+
+Example cloud-init user-data file:
 
 ```yaml
 #cloud-config

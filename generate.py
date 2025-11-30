@@ -115,9 +115,6 @@ def parse_arguments():
     # naming and IDs
     parser.add_argument('--prefix', type=str, default='template', help='set the prefix for VM template names (default: template)')
     parser.add_argument('--id-start', type=int, default=900, help='set the starting ID for VM templates (default: 900)')
-    # cloud-init
-    parser.add_argument('--cloud-init', type=str, default=None, help='path to a cloud-init user-data file. When provided, skips username, password and SSH key prompts and uses --cicustom instead')
-    
     return parser.parse_args()
 
 def clear_screen():
@@ -179,6 +176,103 @@ def select_storage():
     storage = available_storages[storage_choice]
     print('\n-----\n')
     return storage
+
+def get_snippet_storages():
+    """Get list of storage pools that support snippets content type."""
+    # Get storage status with snippets content type
+    res = subprocess.run(['pvesm', 'status', '--content', 'snippets'], 
+                        capture_output=True, text=True)
+    output = res.stdout.strip()
+    if not output:
+        return []
+    
+    # Parse output: skip header line, extract first column (storage name)
+    lines = output.split('\n')
+    storages = []
+    for line in lines[1:]:  # Skip header
+        parts = line.split()
+        if parts:
+            storages.append(parts[0])
+    return [s for s in storages if s]  # Filter out empty strings
+
+def get_cloud_init_files():
+    """Get list of yaml/yml files from all snippet-enabled storage pools.
+    Returns list of volume paths in format storage:snippets/file.yaml
+    """
+    snippet_storages = get_snippet_storages()
+    cloud_init_files = []
+    
+    for storage in snippet_storages:
+        # Validate storage name contains only allowed characters (alphanumeric, dash, underscore)
+        if not storage or not all(c.isalnum() or c in '-_' for c in storage):
+            continue
+        
+        # Get the path for this storage using list form to avoid shell injection
+        res = subprocess.run(['pvesm', 'path', f'{storage}:snippets/'], 
+                           capture_output=True, text=True)
+        storage_path = res.stdout.strip()
+        
+        # Validate storage_path is an absolute path and exists
+        if not storage_path or not os.path.isabs(storage_path) or not os.path.isdir(storage_path):
+            continue
+        
+        # Find all yaml/yml files in the snippets directory
+        for filename in os.listdir(storage_path):
+            # Validate filename contains no path separators
+            if os.sep in filename or (os.altsep and os.altsep in filename):
+                continue
+            if filename.endswith(('.yaml', '.yml')):
+                # Format: storage:snippets/filename.yaml
+                volume_path = f"{storage}:snippets/{filename}"
+                cloud_init_files.append(volume_path)
+    
+    return cloud_init_files
+
+def select_cloud_init_method():
+    """Ask user whether to input credentials manually or use a cloud-init file."""
+    print('Cloud-Init Configuration\n')
+    print('1) Enter credentials manually')
+    print('2) Use a cloud-init file')
+    
+    while True:
+        try:
+            choice = int(input('\nEnter choice: '))
+            if choice in [1, 2]:
+                break
+            else:
+                print('Invalid choice. Please enter 1 or 2.\n')
+        except ValueError:
+            print('Invalid input. Please enter a number.\n')
+    
+    print('\n-----\n')
+    return choice
+
+def select_cloud_init_file():
+    """Display list of cloud-init files and let user select one."""
+    cloud_init_files = get_cloud_init_files()
+    
+    if not cloud_init_files:
+        print('No cloud-init files found in snippet-enabled storage pools.')
+        print('Please add yaml/yml files to a storage pool that supports snippets.')
+        sys.exit(1)
+    
+    print('Select cloud-init file\n')
+    for i, file_path in enumerate(cloud_init_files):
+        print(f'{i+1}) {file_path}')
+    
+    while True:
+        try:
+            choice = int(input('\nEnter choice: ')) - 1
+            if 0 <= choice < len(cloud_init_files):
+                break
+            else:
+                print('Invalid choice. Please try again.\n')
+        except ValueError:
+            print('Invalid input. Please enter a number.\n')
+    
+    selected_file = cloud_init_files[choice]
+    print('\n-----\n')
+    return selected_file
 
 def select_os():
     print('Select OS\n')
@@ -343,23 +437,22 @@ def main():
         'id_start': args.id_start,
     }
     
-    cloud_init_file = args.cloud_init
-    
-    # Validate cloud-init file if provided
-    if cloud_init_file and not os.path.isfile(cloud_init_file):
-        print(f'Error: Cloud-init file not found: {cloud_init_file}')
-        sys.exit(1)
-    
     clear_screen()
     
-    # Skip username, password, and SSH key prompts if cloud-init file is provided
-    if cloud_init_file:
+    # Ask user for cloud-init configuration method
+    cloud_init_method = select_cloud_init_method()
+    
+    if cloud_init_method == 2:
+        # User wants to use a cloud-init file
+        cloud_init_file = select_cloud_init_file()
         print(f'Using cloud-init file: {cloud_init_file}')
         print('\n-----\n')
         username = None
         password = None
         ssh_key = None
     else:
+        # User wants to enter credentials manually
+        cloud_init_file = None
         username = get_username()
         password = get_password()
         ssh_key = get_ssh_key()
