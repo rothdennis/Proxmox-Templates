@@ -2,3 +2,4 @@
 *.xz
 *.img
 cloud-init.yaml
+__pycache__/
