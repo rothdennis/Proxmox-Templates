@@ -101,7 +101,7 @@ To change default settings you can modify the script parameters:
 
 ```bash
 # python3 generate.py --help
-usage: Proxmox VM Template Generator [-h] [--memory MEMORY] [--cores CORES] [--sockets SOCKETS] [--disk-size DISK_SIZE] [--cpu CPU] [--network-bridge NETWORK_BRIDGE] [--ipv4 IPV4] [--ipv6 IPV6] [--prefix PREFIX] [--id-start ID_START]
+usage: Proxmox VM Template Generator [-h] [--memory MEMORY] [--cores CORES] [--sockets SOCKETS] [--disk-size DISK_SIZE] [--cpu CPU] [--network-bridge NETWORK_BRIDGE] [--ipv4 IPV4] [--ipv6 IPV6] [--prefix PREFIX] [--id-start ID_START] [--cloud-init CLOUD_INIT]
 
 Generate Proxmox VM templates from cloud images with custom configurations.
 
@@ -119,6 +119,28 @@ options:
   --ipv6 IPV6           set the IPv6 configuration (default: auto)
   --prefix PREFIX       set the prefix for VM template names (default: template)
   --id-start ID_START   set the starting ID for VM templates (default: 900)
+  --cloud-init CLOUD_INIT
+                        path to a cloud-init user-data file. When provided, skips
+                        username, password and SSH key prompts and uses --cicustom instead
+```
+
+### Using a Custom Cloud-Init File
+
+Instead of entering username, password, and SSH key interactively, you can provide a custom cloud-init user-data file:
+
+```bash
+python3 generate.py --cloud-init /path/to/user-data.yaml
+```
+
+This will skip the credential prompts and use `qm set --cicustom user=<file>` to configure cloud-init from your file. Example cloud-init user-data file:
+
+```yaml
+#cloud-config
+users:
+  - name: myuser
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ssh-rsa AAAA...your-public-key...
 ```
 
 ## Troubleshooting
