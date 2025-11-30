@@ -220,12 +220,15 @@ def get_cloud_init_files():
         # Volid                              Format     Type       Size
         # local:snippets/cloud-init.yaml     snippets   snippets   1234
         lines = output.split('\n')
+        if len(lines) <= 1:
+            continue  # Only header or empty, no actual content
+        
         for line in lines[1:]:  # Skip header
             parts = line.split()
             if parts:
                 volume_path = parts[0]  # First column is the volume ID
-                # Filter for yaml/yml files only
-                if volume_path.endswith(('.yaml', '.yml')):
+                # Validate volume path format: storage:snippets/filename.yaml
+                if ':snippets/' in volume_path and volume_path.endswith(('.yaml', '.yml')):
                     cloud_init_files.append(volume_path)
 
     return cloud_init_files
