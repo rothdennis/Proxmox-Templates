@@ -207,37 +207,29 @@ def get_cloud_init_files():
         if not storage or not all(c.isalnum() or c in '-_' for c in storage):
             continue
 
-        # Get the storage path using pvesm status --storage <storage>
-        res = subprocess.run(['pvesm', 'status', '--storage', storage], capture_output=True, text=True)
-        lines = res.stdout.strip().split('\n')
-        print(lines)
-        storage_path = None
-        for line in lines:
-            if line.startswith(storage):
-                # Try to find the path column (for CIFS/dir)
-                parts = line.split()
-                for part in parts:
-                    if part.startswith('/'):
-                        storage_path = part
-                        break
-                if storage_path:
-                    break
-
-        if not storage_path or not os.path.isabs(storage_path):
+        # Use pvesm list to get snippets in this storage
+        # This returns volumes like: storage:snippets/file.yaml
+        res = subprocess.run(['pvesm', 'list', storage, '--content', 'snippets'], 
+                            capture_output=True, text=True)
+        output = res.stdout.strip()
+        if not output:
             continue
-
-        snippets_dir = os.path.join(storage_path, 'snippets')
-        if not os.path.isdir(snippets_dir):
-            continue
-
-        for filename in os.listdir(snippets_dir):
-            # Validate filename contains no path separators
-            if os.sep in filename or (os.altsep and os.altsep in filename):
-                continue
-            if filename.endswith(('.yaml', '.yml')):
-                # Format: storage:snippets/filename.yaml
-                volume_path = f"{storage}:snippets/{filename}"
-                cloud_init_files.append(volume_path)
+        
+        # Parse output: skip header line, extract volume paths
+        # Output format:
+        # Volid                              Format     Type       Size
+        # local:snippets/cloud-init.yaml     snippets   snippets   1234
+        lines = output.split('\n')
+        if len(lines) <= 1:
+            continue  # Only header or empty, no actual content
+        
+        for line in lines[1:]:  # Skip header
+            parts = line.split()
+            if parts:
+                volume_path = parts[0]  # First column is the volume ID
+                # Validate volume path format: storage:snippets/filename.yaml
+                if ':snippets/' in volume_path and volume_path.endswith(('.yaml', '.yml')):
+                    cloud_init_files.append(volume_path)
 
     return cloud_init_files
 
@@ -266,34 +258,13 @@ def select_cloud_init_file():
     
     if not cloud_init_files:
         print('No cloud-init files found in snippet-enabled storage pools.')
-        # Show which snippet directories were checked
-        checked_dirs = []
         snippet_storages = get_snippet_storages()
-        for storage in snippet_storages:
-            res = subprocess.run(['pvesm', 'status', '--storage', storage], capture_output=True, text=True)
-            lines = res.stdout.strip().split('\n')
-            storage_path = None
-            for line in lines:
-                if line.startswith(storage):
-                    parts = line.split()
-                    for part in parts:
-                        if part.startswith('/'):
-                            storage_path = part
-                            break
-                    if storage_path:
-                        break
-            if storage_path and os.path.isabs(storage_path):
-                snippets_dir = os.path.join(storage_path, 'snippets')
-                checked_dirs.append(snippets_dir)
-        if checked_dirs:
-            print('Checked the following snippet directories:')
-            for d in checked_dirs:
-                print(f'  {d}')
-            print('To add a sample file, run:')
-            print('  touch <directory>/my-cloud-init.yaml')
-            print('  # Or copy your cloud-init YAML file to one of the above directories.')
+        if snippet_storages:
+            print(f'Checked the following snippet-enabled storages: {", ".join(snippet_storages)}')
+            print('To add a cloud-init file, upload a yaml/yml file to the snippets directory')
+            print('of one of these storages using the Proxmox web interface or pvesm.')
         else:
-            print('No snippet-enabled storage directories found.')
+            print('No snippet-enabled storage pools found.')
         print('Please add yaml/yml files to a storage pool that supports snippets.')
         sys.exit(1)
     
