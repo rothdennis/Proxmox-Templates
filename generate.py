@@ -39,6 +39,17 @@ IMAGES = {
     'Fedora':[
         {'Cloud 43': 'https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2'},
     ],
+    'Flatcar Container Linux':[
+        {'Stable': 'https://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_proxmoxve_image.img'},
+        {'Beta': 'https://beta.release.flatcar-linux.net/amd64-usr/current/flatcar_production_proxmoxve_image.img'},
+        {'Alpha': 'https://alpha.release.flatcar-linux.net/amd64-usr/current/flatcar_production_proxmoxve_image.img'},
+    ],
+    'FreeBSD':[
+        {'14.3': 'https://download.freebsd.org/releases/VM-IMAGES/14.3-RELEASE/amd64/Latest/FreeBSD-14.3-RELEASE-amd64-BASIC-CLOUDINIT-ufs.qcow2.xz'},
+    ],
+    'Gentoo Linux':[
+        {'20251130': 'https://distfiles.gentoo.org/releases/amd64/autobuilds/20251130T164554Z/di-amd64-cloudinit-20251130T164554Z.qcow2'},
+    ],
     'Kali Linux':[
         {'2025.3': 'https://kali.download/cloud-images/kali-2025.3/kali-linux-2025.3-cloud-genericcloud-amd64.tar.xz'},
     ],
@@ -381,6 +392,8 @@ def generate_template_name(distro_name, version_choice, prefix):
 def create_template(vm_id, name, image_name, storage, username, password, ssh_key, config, cloud_init_file=None):
     print(f'Generating template ...')
 
+    os_name = name.split('-')[1] if '-' in name else name
+
     # create VM
     subprocess.run(['qm', 'create', vm_id, '--name', name, '--ostype', 'l26'])
     subprocess.run(['qm', 'set', vm_id, '--net0', f"virtio,bridge={config['network_bridge']}"])
@@ -398,14 +411,18 @@ def create_template(vm_id, name, image_name, storage, username, password, ssh_ke
     subprocess.run(['qm', 'set', vm_id, '--boot', 'order=scsi0'])
     subprocess.run(['qm', 'set', vm_id, '--scsihw', 'virtio-scsi-single'])
 
+    if os_name in ['gentoo']:
+        subprocess.run(['qm', 'set', vm_id, '--bios', 'ovmf'])
+        subprocess.run(['qm', 'set', vm_id, '--efidisk0', f'{storage}:1,size=4M,pre-enrolled-keys=0'])
+
     # cloud-init
     subprocess.run(['qm', 'set', vm_id, '--ide2', f'{storage}:cloudinit'])
-    subprocess.run(['qm', 'set', vm_id, '--ipconfig0', f"ip6={config['ipv6']},ip={config['ipv4']}"])
     
     if cloud_init_file:
         # Use custom cloud-init file
-        subprocess.run(['qm', 'set', vm_id, '--cicustom', f'user={cloud_init_file}'])
+        subprocess.run(['qm', 'set', vm_id, '--cicustom', f'user={cloud_init_file},network={cloud_init_file}'])
     else:
+        subprocess.run(['qm', 'set', vm_id, '--ipconfig0', f"ip6={config['ipv6']},ip={config['ipv4']}"])
         # Use interactive credentials
         subprocess.run(['qm', 'set', vm_id, '--ciuser', username])
         subprocess.run(['qm', 'set', vm_id, '--cipassword', password])
@@ -422,7 +439,7 @@ def create_template(vm_id, name, image_name, storage, username, password, ssh_ke
     subprocess.run(['qm', 'set', vm_id, '--agent', 'enabled=1,fstrim_cloned_disks=1'])
 
     # add tag
-    os_name = name.split('-')[1] if '-' in name else name
+    
     subprocess.run(['qm', 'set', vm_id, '--tags', os_name])
 
     # convert to template
