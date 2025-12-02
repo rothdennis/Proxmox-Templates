@@ -419,7 +419,7 @@ def select_os_versions_multi():
                 current_row += 1
             elif key == ord(' '):  # Space to toggle
                 options[current_row]['selected'] = not options[current_row]['selected']
-            elif key == ord('\n') or key == curses.KEY_ENTER:  # Enter to confirm
+            elif key == ord('\n') or key == 10:  # Enter to confirm (newline)
                 break
             elif key == ord('q') or key == ord('Q'):  # q to quit
                 return []
@@ -432,8 +432,13 @@ def select_os_versions_multi():
         selected = curses.wrapper(main_curses)
         return selected
     except Exception as e:
-        print(f"Error in curses interface: {e}")
-        print("Falling back to single selection...")
+        print(f"\nError initializing curses interface: {e}")
+        print("This may happen if:")
+        print("  - Running in a non-interactive terminal")
+        print("  - Terminal doesn't support curses")
+        print("  - TERM environment variable is not set properly")
+        print("\nFalling back to single selection mode...")
+        print("(To use multi-selection, run in a proper terminal)\n")
         # Fallback to original single selection
         distro_name = select_os()
         version_choice = select_version(distro_name)
