@@ -7,6 +7,7 @@ import tempfile
 import os
 from getpass import getpass
 import argparse
+import curses
 
 ### IMAGES ###
 
@@ -335,6 +336,114 @@ def select_version(distro_name):
     
     return version_choice
 
+def select_os_versions_multi():
+    """Multi-selection interface for OS/version combinations using curses.
+    Returns a list of tuples: [(distro_name, version_index), ...]
+    """
+    # Build flat list of all OS/version options
+    options = []
+    for distro_name in IMAGES:
+        for version_index, version_dict in enumerate(IMAGES[distro_name]):
+            version_name = list(version_dict.keys())[0]
+            options.append({
+                'distro_name': distro_name,
+                'version_index': version_index,
+                'version_name': version_name,
+                'display': f'{distro_name} / {version_name}',
+                'selected': False
+            })
+    
+    def draw_menu(stdscr, current_row, selected_options):
+        stdscr.clear()
+        h, w = stdscr.getmaxyx()
+        
+        # Header
+        title = "Select OS/Version Combinations (Space to toggle, Enter to confirm, q to quit)"
+        stdscr.addstr(0, 0, title[:w-1], curses.A_BOLD)
+        stdscr.addstr(1, 0, "=" * min(len(title), w-1))
+        
+        # Calculate visible range
+        visible_rows = h - 4  # Leave space for header and footer
+        start_row = max(0, current_row - visible_rows // 2)
+        end_row = min(len(options), start_row + visible_rows)
+        
+        # Adjust start_row if we're near the end
+        if end_row - start_row < visible_rows and len(options) > visible_rows:
+            start_row = max(0, end_row - visible_rows)
+        
+        # Display options
+        for idx in range(start_row, end_row):
+            option = options[idx]
+            row = idx - start_row + 3
+            
+            if row >= h - 1:  # Prevent writing to last line
+                break
+            
+            # Build display string
+            checkbox = "[X]" if option['selected'] else "[ ]"
+            display_text = f"{checkbox} {option['display']}"
+            
+            # Truncate if necessary
+            if len(display_text) >= w:
+                display_text = display_text[:w-4] + "..."
+            
+            # Highlight current row
+            if idx == current_row:
+                stdscr.addstr(row, 0, display_text, curses.A_REVERSE)
+            else:
+                stdscr.addstr(row, 0, display_text)
+        
+        # Footer
+        if h > 3:
+            footer = f"Selected: {selected_options}/{len(options)}"
+            stdscr.addstr(h - 1, 0, footer[:w-1], curses.A_BOLD)
+        
+        stdscr.refresh()
+    
+    def main_curses(stdscr):
+        # Initialize curses settings
+        curses.curs_set(0)  # Hide cursor
+        stdscr.keypad(True)  # Enable keypad mode
+        
+        current_row = 0
+        
+        while True:
+            selected_count = sum(1 for opt in options if opt['selected'])
+            draw_menu(stdscr, current_row, selected_count)
+            
+            key = stdscr.getch()
+            
+            if key == curses.KEY_UP and current_row > 0:
+                current_row -= 1
+            elif key == curses.KEY_DOWN and current_row < len(options) - 1:
+                current_row += 1
+            elif key == ord(' '):  # Space to toggle
+                options[current_row]['selected'] = not options[current_row]['selected']
+            elif key == ord('\n') or key == 10:  # Enter to confirm (newline)
+                break
+            elif key == ord('q') or key == ord('Q'):  # q to quit
+                return []
+        
+        # Return selected options
+        return [(opt['distro_name'], opt['version_index']) 
+                for opt in options if opt['selected']]
+    
+    try:
+        selected = curses.wrapper(main_curses)
+        return selected
+    except Exception as e:
+        print(f"\nError initializing curses interface: {e}")
+        print("This may happen if:")
+        print("  - Running in a non-interactive terminal")
+        print("  - Terminal doesn't support curses")
+        print("  - TERM environment variable is not set properly")
+        print("\nFalling back to single selection mode...")
+        print("(To use multi-selection, run in a proper terminal)\n")
+        # Fallback to original single selection
+        distro_name = select_os()
+        version_choice = select_version(distro_name)
+        return [(distro_name, version_choice)]
+
 def generate_unique_id(id_start):
     res = subprocess.run("qm list | awk 'NR>1 {print $1}'", capture_output=True, text=True, shell=True)
     output = res.stdout.strip()
@@ -487,18 +596,40 @@ def main():
         ssh_key = get_ssh_key()
     
     storage = select_storage()
-    distro_name = select_os()
-    version_choice = select_version(distro_name)
     
-    vm_id = generate_unique_id(config['id_start'])
+    # Use multi-selection interface
+    selected_combinations = select_os_versions_multi()
     
-    image_url = list(IMAGES[distro_name][version_choice].values())[0]
-    image_name = download_image(image_url)
-    image_name = decompress_image(image_name)
+    if not selected_combinations:
+        print('No OS/version combinations selected. Exiting.')
+        sys.exit(0)
     
-    name = generate_template_name(distro_name, version_choice, config['prefix'])
+    clear_screen()
+    print(f'Creating {len(selected_combinations)} template(s)...\n')
     
-    create_template(vm_id, name, image_name, storage, username, password, ssh_key, config, cloud_init_file)
+    # Create templates for all selected combinations
+    current_id = config['id_start']
+    for idx, (distro_name, version_choice) in enumerate(selected_combinations, 1):
+        print(f'\n{"="*60}')
+        print(f'Processing template {idx}/{len(selected_combinations)}: {distro_name} / {list(IMAGES[distro_name][version_choice].keys())[0]}')
+        print(f'{"="*60}\n')
+        
+        vm_id = generate_unique_id(current_id)
+        current_id = int(vm_id) + 1  # Increment for next template
+        
+        image_url = list(IMAGES[distro_name][version_choice].values())[0]
+        image_name = download_image(image_url)
+        image_name = decompress_image(image_name)
+        
+        name = generate_template_name(distro_name, version_choice, config['prefix'])
+        
+        create_template(vm_id, name, image_name, storage, username, password, ssh_key, config, cloud_init_file)
+        
+        print(f'\nTemplate {name} (ID: {vm_id}) created successfully!\n')
+    
+    print(f'\n{"="*60}')
+    print(f'All {len(selected_combinations)} template(s) created successfully!')
+    print(f'{"="*60}\n')
 
 
 if __name__ == '__main__':
