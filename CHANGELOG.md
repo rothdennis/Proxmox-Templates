@@ -1,5 +1,10 @@
 # Changelog
 
+## 2025-12-03
+
+- add the ability to create multiple templates at once
+![create multiple templates](img/screenshot2.png)
+
 ## 2025-12-01
 
 - add support for the following operating systems:
