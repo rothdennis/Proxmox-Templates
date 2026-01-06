@@ -51,6 +51,8 @@ The script automatically assigns the next available VM ID starting at 900.
 
 ## Supported Operating Systems
 
+> **Note:** The operating system images and their download URLs are now maintained in the [`images.json`](images.json) configuration file. This allows for easier updates and maintenance of supported distributions without modifying the main script.
+
 | OS | Versions |Images|
 |:---|:--|:--|
 | [**Alpine**](https://alpinelinux.org/) | 3.22, 3.21, 3.20 | [Link](https://alpinelinux.org/cloud/) |
