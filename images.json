@@ -121,8 +121,8 @@
         "tag": "gentoo",
         "versions": [
             {
-                "name": "20251130",
-                "url": "https://distfiles.gentoo.org/releases/amd64/autobuilds/20251130T164554Z/di-amd64-cloudinit-20251130T164554Z.qcow2"
+                "name": "2026-01-05",
+                "url": "https://distfiles.gentoo.org/releases/amd64/autobuilds/20260105T081601Z/di-amd64-cloudinit-20260105T081601Z.qcow2"
             }
         ]
     },
