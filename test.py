@@ -1,40 +1,41 @@
 import unittest
-import configparser
+import json
 import urllib.request
 import urllib.error
 from pathlib import Path
 
 
 class TestImageURLs(unittest.TestCase):
-    """Test that all image URLs in images.toml are accessible."""
+    """Test that all image URLs in images.json are accessible."""
     
     @classmethod
     def setUpClass(cls):
         """Load the configuration file once for all tests."""
-        cls.config = configparser.ConfigParser()
-        config_path = Path(__file__).parent / 'images.toml'
+        config_path = Path(__file__).parent / 'images.json'
         
         if not config_path.exists():
             raise FileNotFoundError(f"Configuration file not found: {config_path}")
         
-        cls.config.read(config_path)
+        with open(config_path, 'r') as f:
+            cls.images = json.load(f)
+        
         cls.timeout = 5
         cls.user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     
     def test_config_file_loaded(self):
-        """Test that the configuration file has sections."""
-        self.assertTrue(len(self.config.sections()) > 0, 
-                       "Configuration file should have at least one section")
+        """Test that the configuration file has distributions."""
+        self.assertTrue(len(self.images) > 0, 
+                       "Configuration file should have at least one distribution")
     
     def test_all_urls_accessible(self):
         """Test that all URLs in the configuration are accessible."""
         failed_urls = []
         
-        for section in self.config.sections():
-            for key in self.config[section]:
-                url = self.config[section][key]
-                
-                with self.subTest(distribution=section, version=key, url=url):
+        for distro_name in self.images:
+            for version in self.images[distro_name]['versions']:
+                version_name = version['name']
+                url = version['url']
+                with self.subTest(distribution=distro_name, version=version_name, url=url):
                     try:
                         request = urllib.request.Request(
                             url,
@@ -45,24 +46,24 @@ class TestImageURLs(unittest.TestCase):
                                            f"URL returned status {response.status}")
                     except urllib.error.HTTPError as e:
                         failed_urls.append({
-                            'section': section,
-                            'key': key,
+                            'distribution': distro_name,
+                            'version': version_name,
                             'url': url,
                             'error': f"HTTP {e.code}"
                         })
-                        self.fail(f"HTTP error {e.code} for {section} {key}")
+                        self.fail(f"HTTP error {e.code} for {distro_name} {version_name}")
                     except urllib.error.URLError as e:
                         failed_urls.append({
-                            'section': section,
-                            'key': key,
+                            'distribution': distro_name,
+                            'version': version_name,
                             'url': url,
                             'error': f"URL Error: {e.reason}"
                         })
                         self.fail(f"URL error: {e.reason}")
                     except Exception as e:
                         failed_urls.append({
-                            'section': section,
-                            'key': key,
+                            'distribution': distro_name,
+                            'version': version_name,
                             'url': url,
                             'error': str(e)
                         })
@@ -71,12 +72,12 @@ class TestImageURLs(unittest.TestCase):
         # Store failed URLs as class attribute for tearDown reporting
         self.__class__.failed_urls = failed_urls
     
-    def test_each_section_has_urls(self):
-        """Test that each section has at least one URL."""
-        for section in self.config.sections():
-            with self.subTest(section=section):
-                self.assertTrue(len(self.config[section]) > 0,
-                              f"Section '{section}' should have at least one URL")
+    def test_each_distribution_has_urls(self):
+        """Test that each distribution has at least one version/URL."""
+        for distro_name in self.images:
+            with self.subTest(distribution=distro_name):
+                self.assertTrue(len(self.images[distro_name]['versions']) > 0,
+                              f"Distribution '{distro_name}' should have at least one version")
     
     @classmethod
     def tearDownClass(cls):
@@ -86,7 +87,7 @@ class TestImageURLs(unittest.TestCase):
             print("FAILED URL SUMMARY")
             print("="*80)
             for failure in cls.failed_urls:
-                print(f"{failure['section']:30}{failure['key']:20}{failure['error']}")
+                print(f"{failure['distribution']:30}{failure['version']:20}{failure['error']}")
             print("="*80)
 
 
