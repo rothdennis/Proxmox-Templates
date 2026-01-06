@@ -1,129 +1,205 @@
 {
-    "images": {
-        "Alma Linux": [
+    "Alma Linux": {
+        "tag": "alma",
+        "versions": [
             {
-                "10": "https://repo.almalinux.org/almalinux/10/cloud/x86_64/images/AlmaLinux-10-GenericCloud-latest.x86_64.qcow2"
+                "name": "10",
+                "url": "https://repo.almalinux.org/almalinux/10/cloud/x86_64/images/AlmaLinux-10-GenericCloud-latest.x86_64.qcow2"
             },
             {
-                "9": "https://repo.almalinux.org/almalinux/9/cloud/x86_64/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2"
+                "name": "9",
+                "url": "https://repo.almalinux.org/almalinux/9/cloud/x86_64/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2"
             },
             {
-                "8": "https://repo.almalinux.org/almalinux/8/cloud/x86_64/images/AlmaLinux-8-GenericCloud-8.10-20240530.x86_64.qcow2"
+                "name": "8",
+                "url": "https://repo.almalinux.org/almalinux/8/cloud/x86_64/images/AlmaLinux-8-GenericCloud-8.10-20240530.x86_64.qcow2"
             }
-        ],
-        "Alpine Linux": [
+        ]
+    },
+    "Alpine Linux": {
+        "tag": "alpine",
+        "versions": [
             {
-                "3.22": "https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/cloud/generic_alpine-3.22.2-x86_64-bios-cloudinit-r0.qcow2"
+                "name": "3.22",
+                "url": "https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/cloud/generic_alpine-3.22.2-x86_64-bios-cloudinit-r0.qcow2"
             },
             {
-                "3.21": "https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/cloud/generic_alpine-3.21.5-x86_64-bios-cloudinit-r0.qcow2"
+                "name": "3.21",
+                "url": "https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/cloud/generic_alpine-3.21.5-x86_64-bios-cloudinit-r0.qcow2"
             },
             {
-                "3.20": "https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/cloud/generic_alpine-3.20.8-x86_64-bios-cloudinit-r0.qcow2"
+                "name": "3.20",
+                "url": "https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/cloud/generic_alpine-3.20.8-x86_64-bios-cloudinit-r0.qcow2"
             }
-        ],
-        "Amazon Linux": [
+        ]
+    },
+    "Amazon Linux": {
+        "tag": "amazon",
+        "versions": [
             {
-                "2023": "https://cdn.amazonlinux.com/al2023/os-images/2023.9.20251110.1/kvm/al2023-kvm-2023.9.20251110.1-kernel-6.1-x86_64.xfs.gpt.qcow2"
+                "name": "2023",
+                "url": "https://cdn.amazonlinux.com/al2023/os-images/2023.9.20251110.1/kvm/al2023-kvm-2023.9.20251110.1-kernel-6.1-x86_64.xfs.gpt.qcow2"
             },
             {
-                "2": "https://cdn.amazonlinux.com/os-images/2.0.20251110.1/kvm/amzn2-kvm-2.0.20251110.1-x86_64.xfs.gpt.qcow2"
+                "name": "2",
+                "url": "https://cdn.amazonlinux.com/os-images/2.0.20251110.1/kvm/amzn2-kvm-2.0.20251110.1-x86_64.xfs.gpt.qcow2",
+                "deprecated": true
             }
-        ],
-        "Arch Linux": [
+        ]
+    },
+    "Arch Linux": {
+        "tag": "arch",
+        "versions": [
             {
-                "latest": "https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
+                "name": "latest",
+                "url": "https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
             }
-        ],
-        "CentOS Stream": [
+        ]
+    },
+    "CentOS Stream": {
+        "tag": "centos",
+        "versions": [
             {
-                "10": "https://cloud.centos.org/centos/10-stream/x86_64/images/CentOS-Stream-GenericCloud-10-latest.x86_64.qcow2"
+                "name": "10",
+                "url": "https://cloud.centos.org/centos/10-stream/x86_64/images/CentOS-Stream-GenericCloud-10-latest.x86_64.qcow2"
             },
             {
-                "9": "https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-x86_64-9-latest.x86_64.qcow2"
+                "name": "9",
+                "url": "https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-x86_64-9-latest.x86_64.qcow2"
             }
-        ],
-        "Debian": [
+        ]
+    },
+    "Debian": {
+        "tag": "debian",
+        "versions": [
             {
-                "13": "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
+                "name": "13",
+                "url": "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
             },
             {
-                "12": "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
+                "name": "12",
+                "url": "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
             }
-        ],
-        "Fedora Cloud": [
+        ]
+    },
+    "Fedora Cloud": {
+        "tag": "fedora",
+        "versions": [
             {
-                "43": "https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2"
+                "name": "43",
+                "url": "https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2"
             }
-        ],
-        "Flatcar Container Linux": [
+        ]
+    },
+    "Flatcar Container Linux": {
+        "tag": "flatcar",
+        "versions": [
             {
-                "stable": "https://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_proxmoxve_image.img"
+                "name": "stable",
+                "url": "https://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_proxmoxve_image.img"
             },
             {
-                "beta": "https://beta.release.flatcar-linux.net/amd64-usr/current/flatcar_production_proxmoxve_image.img"
+                "name": "beta",
+                "url": "https://beta.release.flatcar-linux.net/amd64-usr/current/flatcar_production_proxmoxve_image.img"
             },
             {
-                "alpha": "https://alpha.release.flatcar-linux.net/amd64-usr/current/flatcar_production_proxmoxve_image.img"
+                "name": "alpha",
+                "url": "https://alpha.release.flatcar-linux.net/amd64-usr/current/flatcar_production_proxmoxve_image.img"
             }
-        ],
-        "FreeBSD": [
+        ]
+    },
+    "FreeBSD": {
+        "tag": "freebsd",
+        "versions": [
             {
-                "14.3": "https://download.freebsd.org/releases/VM-IMAGES/14.3-RELEASE/amd64/Latest/FreeBSD-14.3-RELEASE-amd64-BASIC-CLOUDINIT-ufs.qcow2.xz"
+                "name": "14.3",
+                "url": "https://download.freebsd.org/releases/VM-IMAGES/14.3-RELEASE/amd64/Latest/FreeBSD-14.3-RELEASE-amd64-BASIC-CLOUDINIT-ufs.qcow2.xz"
             }
-        ],
-        "Gentoo Linux": [
+        ]
+    },
+    "Gentoo Linux": {
+        "tag": "gentoo",
+        "versions": [
             {
-                "20251130": "https://distfiles.gentoo.org/releases/amd64/autobuilds/20251130T164554Z/di-amd64-cloudinit-20251130T164554Z.qcow2"
+                "name": "20251130",
+                "url": "https://distfiles.gentoo.org/releases/amd64/autobuilds/20251130T164554Z/di-amd64-cloudinit-20251130T164554Z.qcow2"
             }
-        ],
-        "Kali Linux": [
+        ]
+    },
+    "Kali Linux": {
+        "tag": "kali",
+        "versions": [
             {
-                "2025.3": "https://kali.download/cloud-images/kali-2025.3/kali-linux-2025.3-cloud-genericcloud-amd64.tar.xz"
+                "name": "2025.3",
+                "url": "https://kali.download/cloud-images/kali-2025.3/kali-linux-2025.3-cloud-genericcloud-amd64.tar.xz"
             }
-        ],
-        "openSUSE": [
+        ]
+    },
+    "openSUSE": {
+        "tag": "opensuse",
+        "versions": [
             {
-                "tumbleweed": "https://download.opensuse.org/tumbleweed/appliances/openSUSE-Tumbleweed-Minimal-VM.x86_64-Cloud.qcow2"
+                "name": "tumbleweed",
+                "url": "https://download.opensuse.org/tumbleweed/appliances/openSUSE-Tumbleweed-Minimal-VM.x86_64-Cloud.qcow2"
             }
-        ],
-        "Oracle Linux": [
+        ]
+    },
+    "Oracle Linux": {
+        "tag": "oracle",
+        "versions": [
             {
-                "10.0": "https://yum.oracle.com/templates/OracleLinux/OL10/u0/x86_64/OL10U0_x86_64-kvm-b266.qcow2"
+                "name": "10.0",
+                "url": "https://yum.oracle.com/templates/OracleLinux/OL10/u0/x86_64/OL10U0_x86_64-kvm-b266.qcow2"
             },
             {
-                "9.6": "https://yum.oracle.com/templates/OracleLinux/OL9/u6/x86_64/OL9U6_x86_64-kvm-b265.qcow2"
+                "name": "9.6",
+                "url": "https://yum.oracle.com/templates/OracleLinux/OL9/u6/x86_64/OL9U6_x86_64-kvm-b265.qcow2"
             },
             {
-                "8.10": "https://yum.oracle.com/templates/OracleLinux/OL8/u10/x86_64/OL8U10_x86_64-kvm-b258.qcow2"
+                "name": "8.10",
+                "url": "https://yum.oracle.com/templates/OracleLinux/OL8/u10/x86_64/OL8U10_x86_64-kvm-b258.qcow2"
             },
             {
-                "7.9": "https://yum.oracle.com/templates/OracleLinux/OL7/u9/x86_64/OL7U9_x86_64-kvm-b257.qcow2"
+                "name": "7.9",
+                "url": "https://yum.oracle.com/templates/OracleLinux/OL7/u9/x86_64/OL7U9_x86_64-kvm-b257.qcow2"
             }
-        ],
-        "Rocky Linux": [
+        ]
+    },
+    "Rocky Linux": {
+        "tag": "rocky",
+        "versions": [
             {
-                "10": "https://dl.rockylinux.org/pub/rocky/10/images/x86_64/Rocky-10-GenericCloud-Base.latest.x86_64.qcow2"
+                "name": "10",
+                "url": "https://dl.rockylinux.org/pub/rocky/10/images/x86_64/Rocky-10-GenericCloud-Base.latest.x86_64.qcow2"
             },
             {
-                "9": "https://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2"
+                "name": "9",
+                "url": "https://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2"
             },
             {
-                "8": "https://dl.rockylinux.org/pub/rocky/8/images/x86_64/Rocky-8-GenericCloud-Base.latest.x86_64.qcow2"
+                "name": "8",
+                "url": "https://dl.rockylinux.org/pub/rocky/8/images/x86_64/Rocky-8-GenericCloud-Base.latest.x86_64.qcow2"
             }
-        ],
-        "Ubuntu": [
+        ]
+    },
+    "Ubuntu": {
+        "tag": "ubuntu",
+        "versions": [
             {
-                "25.10": "https://cloud-images.ubuntu.com/releases/25.10/release/ubuntu-25.10-server-cloudimg-amd64.img"
+                "name": "25.10",
+                "url": "https://cloud-images.ubuntu.com/releases/25.10/release/ubuntu-25.10-server-cloudimg-amd64.img"
             },
             {
-                "25.04": "https://cloud-images.ubuntu.com/releases/25.04/release/ubuntu-25.04-server-cloudimg-amd64.img"
+                "name": "25.04",
+                "url": "https://cloud-images.ubuntu.com/releases/25.04/release/ubuntu-25.04-server-cloudimg-amd64.img"
             },
             {
-                "24.04": "https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img"
+                "name": "24.04",
+                "url": "https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img"
             },
             {
-                "22.04": "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
+                "name": "22.04",
+                "url": "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
             }
         ]
     }

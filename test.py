@@ -17,9 +17,8 @@ class TestImageURLs(unittest.TestCase):
             raise FileNotFoundError(f"Configuration file not found: {config_path}")
         
         with open(config_path, 'r') as f:
-            cls.config = json.load(f)
+            cls.images = json.load(f)
         
-        cls.images = cls.config['images']
         cls.timeout = 5
         cls.user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     
@@ -33,42 +32,42 @@ class TestImageURLs(unittest.TestCase):
         failed_urls = []
         
         for distro_name in self.images:
-            for version_dict in self.images[distro_name]:
-                # Each version_dict is like {"3.22": "https://..."}
-                for version, url in version_dict.items():
-                    with self.subTest(distribution=distro_name, version=version, url=url):
-                        try:
-                            request = urllib.request.Request(
-                                url,
-                                headers={'User-Agent': self.user_agent}
-                            )
-                            with urllib.request.urlopen(request, timeout=self.timeout) as response:
-                                self.assertEqual(response.status, 200,
-                                               f"URL returned status {response.status}")
-                        except urllib.error.HTTPError as e:
-                            failed_urls.append({
-                                'distribution': distro_name,
-                                'version': version,
-                                'url': url,
-                                'error': f"HTTP {e.code}"
-                            })
-                            self.fail(f"HTTP error {e.code} for {distro_name} {version}")
-                        except urllib.error.URLError as e:
-                            failed_urls.append({
-                                'distribution': distro_name,
-                                'version': version,
-                                'url': url,
-                                'error': f"URL Error: {e.reason}"
-                            })
-                            self.fail(f"URL error: {e.reason}")
-                        except Exception as e:
-                            failed_urls.append({
-                                'distribution': distro_name,
-                                'version': version,
-                                'url': url,
-                                'error': str(e)
-                            })
-                            self.fail(f"Unexpected error: {str(e)}")
+            for version in self.images[distro_name]['versions']:
+                version_name = version['name']
+                url = version['url']
+                with self.subTest(distribution=distro_name, version=version_name, url=url):
+                    try:
+                        request = urllib.request.Request(
+                            url,
+                            headers={'User-Agent': self.user_agent}
+                        )
+                        with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                            self.assertEqual(response.status, 200,
+                                           f"URL returned status {response.status}")
+                    except urllib.error.HTTPError as e:
+                        failed_urls.append({
+                            'distribution': distro_name,
+                            'version': version_name,
+                            'url': url,
+                            'error': f"HTTP {e.code}"
+                        })
+                        self.fail(f"HTTP error {e.code} for {distro_name} {version_name}")
+                    except urllib.error.URLError as e:
+                        failed_urls.append({
+                            'distribution': distro_name,
+                            'version': version_name,
+                            'url': url,
+                            'error': f"URL Error: {e.reason}"
+                        })
+                        self.fail(f"URL error: {e.reason}")
+                    except Exception as e:
+                        failed_urls.append({
+                            'distribution': distro_name,
+                            'version': version_name,
+                            'url': url,
+                            'error': str(e)
+                        })
+                        self.fail(f"Unexpected error: {str(e)}")
         
         # Store failed URLs as class attribute for tearDown reporting
         self.__class__.failed_urls = failed_urls
@@ -77,7 +76,7 @@ class TestImageURLs(unittest.TestCase):
         """Test that each distribution has at least one version/URL."""
         for distro_name in self.images:
             with self.subTest(distribution=distro_name):
-                self.assertTrue(len(self.images[distro_name]) > 0,
+                self.assertTrue(len(self.images[distro_name]['versions']) > 0,
                               f"Distribution '{distro_name}' should have at least one version")
     
     @classmethod

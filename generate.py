@@ -12,8 +12,7 @@ import json
 
 IMAGES_URL = 'https://raw.githubusercontent.com/rothdennis/Proxmox-Templates/refs/heads/main/images.json'
 # Load images configuration
-config = json.loads(urllib.request.urlopen(IMAGES_URL).read().decode('utf-8'))
-IMAGES = config['images']
+IMAGES = json.loads(urllib.request.urlopen(IMAGES_URL).read().decode('utf-8'))
 
 ### HELPER FUNCTIONS ###
 
@@ -258,14 +257,16 @@ def select_os():
 
 def select_version(distro_name):
     print('Select Version\n')
-    for i, version in enumerate(IMAGES[distro_name]):
-        version_name = list(version.keys())[0]
-        print(f'{i+1}) {version_name}')
+    versions = IMAGES[distro_name]['versions']
+    for i, version in enumerate(versions):
+        version_name = version['name']
+        deprecated_tag = " (deprecated)" if version.get('deprecated', False) else ""
+        print(f'{i+1}) {version_name}{deprecated_tag}')
     
     while True:
         try:
             version_choice = int(input('\nEnter choice: ')) - 1
-            if 0 <= version_choice < len(IMAGES[distro_name]):
+            if 0 <= version_choice < len(versions):
                 break
             else:
                 print('Invalid choice. Please try again.\n')
@@ -282,13 +283,15 @@ def select_os_versions_multi():
     # Build flat list of all OS/version options
     options = []
     for distro_name in IMAGES:
-        for version_index, version_dict in enumerate(IMAGES[distro_name]):
-            version_name = list(version_dict.keys())[0]
+        versions = IMAGES[distro_name]['versions']
+        for version_index, version in enumerate(versions):
+            version_name = version['name']
+            deprecated_tag = " (deprecated)" if version.get('deprecated', False) else ""
             options.append({
                 'distro_name': distro_name,
                 'version_index': version_index,
                 'version_name': version_name,
-                'display': f'{distro_name} / {version_name}',
+                'display': f'{distro_name} / {version_name}{deprecated_tag}',
                 'selected': False
             })
     
@@ -434,13 +437,13 @@ def decompress_image(image_name):
 
 def generate_template_name(distro_name, version_choice, prefix):
     os_name = distro_name.lower().replace(' ', '-')
-    os_version = list(IMAGES[distro_name][version_choice].keys())[0].lower().replace(' ', '-').replace('.', '-')
+    os_version = IMAGES[distro_name]['versions'][version_choice]['name'].lower().replace(' ', '-').replace('.', '-')
     return f'{prefix}-{os_name}-{os_version}'
 
-def create_template(vm_id, name, image_name, storage, username, password, ssh_key, config, cloud_init_file=None):
+def create_template(vm_id, name, image_name, storage, username, password, ssh_key, config, distro_name, cloud_init_file=None):
     print(f'Generating template ...')
 
-    os_name = name.split('-')[1] if '-' in name else name
+    os_tag = IMAGES[distro_name]['tag']
 
     # create VM
     subprocess.run(['qm', 'create', vm_id, '--name', name, '--ostype', 'l26'])
@@ -459,7 +462,7 @@ def create_template(vm_id, name, image_name, storage, username, password, ssh_ke
     subprocess.run(['qm', 'set', vm_id, '--boot', 'order=scsi0'])
     subprocess.run(['qm', 'set', vm_id, '--scsihw', 'virtio-scsi-single'])
 
-    if os_name in ['gentoo']:
+    if os_tag in ['gentoo']:
         subprocess.run(['qm', 'set', vm_id, '--bios', 'ovmf'])
         subprocess.run(['qm', 'set', vm_id, '--efidisk0', f'{storage}:1,size=4M,pre-enrolled-keys=0'])
 
@@ -488,7 +491,7 @@ def create_template(vm_id, name, image_name, storage, username, password, ssh_ke
 
     # add tag
     
-    subprocess.run(['qm', 'set', vm_id, '--tags', os_name])
+    subprocess.run(['qm', 'set', vm_id, '--tags', os_tag])
 
     # convert to template
     subprocess.run(['qm', 'template', vm_id])
@@ -550,19 +553,19 @@ def main():
     current_id = config['id_start']
     for idx, (distro_name, version_choice) in enumerate(selected_combinations, 1):
         print(f'\n{"="*60}')
-        print(f'Processing template {idx}/{len(selected_combinations)}: {distro_name} / {list(IMAGES[distro_name][version_choice].keys())[0]}')
+        print(f'Processing template {idx}/{len(selected_combinations)}: {distro_name} / {IMAGES[distro_name]["versions"][version_choice]["name"]}')
         print(f'{"="*60}\n')
         
         vm_id = generate_unique_id(current_id)
         current_id = int(vm_id) + 1  # Increment for next template
         
-        image_url = list(IMAGES[distro_name][version_choice].values())[0]
+        image_url = IMAGES[distro_name]['versions'][version_choice]['url']
         image_name = download_image(image_url)
         image_name = decompress_image(image_name)
         
         name = generate_template_name(distro_name, version_choice, config['prefix'])
         
-        create_template(vm_id, name, image_name, storage, username, password, ssh_key, config, cloud_init_file)
+        create_template(vm_id, name, image_name, storage, username, password, ssh_key, config, distro_name, cloud_init_file)
         
         print(f'\nTemplate {name} (ID: {vm_id}) created successfully!\n')
     
