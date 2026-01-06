@@ -2,19 +2,26 @@ name: Test Image URLs
 
 on:
   schedule:
-    # Run every day at 06:00 UTC
     - cron: '0 6 * * *'
-  # Allow manual trigger for testing
   workflow_dispatch:
   push:
     branches:
       - main
+    paths:
+      - 'images.json'
+      - 'test.py'
+      - '.github/workflows/test-images.yml'
+  pull_request:
+    paths:
+      - 'images.json'
+      - 'test.py'
 
 jobs:
   test-images:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      issues: write
     
     steps:
       - name: Checkout repository
@@ -26,4 +33,109 @@ jobs:
           python-version: '3.13'
       
       - name: Run image URL tests
-        run: python3 test.py
+        id: test
+        continue-on-error: true
+        run: |
+          python3 test.py 2>&1 | tee test_output.txt
+          echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.run_number }}
+          path: test_output.txt
+          retention-days: 30
+      
+      - name: Parse test results
+        if: always()
+        id: parse
+        run: |
+          if grep -q "FAILED URL SUMMARY" test_output.txt; then
+            echo "has_failures=true" >> $GITHUB_OUTPUT
+            # Extract failed URLs for issue body
+            sed -n '/FAILED URL SUMMARY/,/====/p' test_output.txt > failures.txt
+          else
+            echo "has_failures=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create issue for failures
+        if: failure() && steps.parse.outputs.has_failures == 'true' && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const failures = fs.readFileSync('failures.txt', 'utf8');
+            
+            // Check if an open issue already exists
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'automated,url-test-failure'
+            });
+            
+            const existingIssue = issues.data.find(issue => 
+              issue.title === '🚨 Image URL Test Failures Detected'
+            );
+            
+            const body = `## Image URL Test Failures
+            
+            The automated image URL tests have detected broken links.
+            
+            **Run:** [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            **Date:** ${new Date().toISOString()}
+            
+            ### Failed URLs
+            \`\`\`
+            ${failures}
+            \`\`\`
+            
+            ### Action Required
+            Please verify and update the affected URLs in \`images.json\`.
+            
+            ### Test Results
+            Full test output is available in the workflow artifacts.`;
+            
+            if (existingIssue) {
+              // Update existing issue with new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: `### New Failure Detected\n\n${body}`
+              });
+              console.log(`Updated existing issue #${existingIssue.number}`);
+            } else {
+              // Create new issue
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '🚨 Image URL Test Failures Detected',
+                body: body,
+                labels: ['automated', 'url-test-failure', 'bug']
+              });
+              console.log('Created new issue');
+            }
+      
+      - name: Post summary
+        if: always()
+        run: |
+          echo "## Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.test.outputs.exit_code }}" = "0" ]; then
+            echo "✅ All image URLs are accessible!" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Some image URLs failed the accessibility check." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Failed URLs" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat failures.txt 2>/dev/null || echo "No failure details available" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 [Full test output available in artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Fail workflow if tests failed
+        if: steps.test.outputs.exit_code != '0'
+        run: exit 1
