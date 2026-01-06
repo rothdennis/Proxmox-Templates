@@ -8,11 +8,11 @@ import os
 from getpass import getpass
 import argparse
 import curses
-import tomllib
+import json
 
-IMAGES_URL = 'https://raw.githubusercontent.com/rothdennis/Proxmox-Templates/refs/heads/main/images.toml'
+IMAGES_URL = 'https://raw.githubusercontent.com/rothdennis/Proxmox-Templates/refs/heads/main/images.json'
 # Load images configuration
-config = tomllib.loads(urllib.request.urlopen(IMAGES_URL).read().decode('utf-8'))
+config = json.loads(urllib.request.urlopen(IMAGES_URL).read().decode('utf-8'))
 IMAGES = config['images']
 
 ### HELPER FUNCTIONS ###
