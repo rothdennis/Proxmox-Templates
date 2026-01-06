@@ -19,7 +19,7 @@ class TestImageURLs(unittest.TestCase):
         with open(config_path, 'r') as f:
             cls.images = json.load(f)
         
-        cls.timeout = 5
+        cls.timeout = 10
         cls.user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     
     def test_config_file_loaded(self):
