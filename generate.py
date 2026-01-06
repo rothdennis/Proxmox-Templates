@@ -440,10 +440,10 @@ def generate_template_name(distro_name, version_choice, prefix):
     os_version = IMAGES[distro_name]['versions'][version_choice]['name'].lower().replace(' ', '-').replace('.', '-')
     return f'{prefix}-{os_name}-{os_version}'
 
-def create_template(vm_id, name, image_name, storage, username, password, ssh_key, config, cloud_init_file=None):
+def create_template(vm_id, name, image_name, storage, username, password, ssh_key, config, distro_name, cloud_init_file=None):
     print(f'Generating template ...')
 
-    os_tag = name.split('-')[1] if '-' in name else name
+    os_tag = IMAGES[distro_name]['tag']
 
     # create VM
     subprocess.run(['qm', 'create', vm_id, '--name', name, '--ostype', 'l26'])
@@ -565,7 +565,7 @@ def main():
         
         name = generate_template_name(distro_name, version_choice, config['prefix'])
         
-        create_template(vm_id, name, image_name, storage, username, password, ssh_key, config, cloud_init_file)
+        create_template(vm_id, name, image_name, storage, username, password, ssh_key, config, distro_name, cloud_init_file)
         
         print(f'\nTemplate {name} (ID: {vm_id}) created successfully!\n')
     
