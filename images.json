@@ -1,0 +1,26 @@
+{
+    "Alpine Linux": [
+        {
+            "version": "3.22",
+            "url": "https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/cloud/generic_alpine-3.22.2-x86_64-bios-cloudinit-r0.qcow2"
+        },
+        {
+            "version": "3.21",
+            "url": "https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/cloud/generic_alpine-3.21.5-x86_64-bios-cloudinit-r0.qcow2"
+        },
+        {
+            "version": "3.20",
+            "url": "https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/cloud/generic_alpine-3.20.8-x86_64-bios-cloudinit-r0.qcow2"
+        }
+    ],
+    "Amazon Linux": [
+        {
+            "version": "2023",
+            "url": "https://cdn.amazonlinux.com/al2023/os-images/2023.9.20251110.1/kvm/al2023-kvm-2023.9.20251110.1-kernel-6.1-x86_64.xfs.gpt.qcow2"
+        },
+        {
+            "version": "2",
+            "url": "https://cdn.amazonlinux.com/os-images/2.0.20251110.1/kvm/amzn2-kvm-2.0.20251110.1-x86_64.xfs.gpt.qcow2"
+        }
+    ]
+}
