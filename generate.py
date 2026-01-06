@@ -291,7 +291,7 @@ def select_os_versions_multi():
                 'distro_name': distro_name,
                 'version_index': version_index,
                 'version_name': version_name,
-                'display': f'{distro_name} / {version_name}{deprecated_tag}',
+                'display': f'{distro_name:<30}{version_name}{deprecated_tag}',
                 'selected': False
             })
     
