@@ -20,6 +20,10 @@
         "tag": "alpine",
         "versions": [
             {
+                "name": "3.23",
+                "url": "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/generic_alpine-3.23.0-x86_64-bios-cloudinit-r0.qcow2"
+            },
+            {
                 "name": "3.22",
                 "url": "https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/cloud/generic_alpine-3.22.2-x86_64-bios-cloudinit-r0.qcow2"
             },
@@ -200,6 +204,16 @@
             {
                 "name": "22.04",
                 "url": "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
+            },
+            {
+                "name": "20.04",
+                "url": "https://cloud-images.ubuntu.com/releases/20.04/release/ubuntu-20.04-server-cloudimg-amd64.img",
+                "deprecated": true
+            },
+            {
+                "name": "18.04",
+                "url": "https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.img",
+                "deprecated": true
             }
         ]
     }
