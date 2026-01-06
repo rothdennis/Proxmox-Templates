@@ -3,3 +3,4 @@
 *.img
 cloud-init.yaml
 __pycache__/
+.vscode
