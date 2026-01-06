@@ -53,23 +53,21 @@ The script automatically assigns the next available VM ID starting at 900.
 
 > **Note:** The operating system images and their download URLs are now maintained in the [`images.json`](images.json) configuration file. This allows for easier updates and maintenance of supported distributions without modifying the main script.
 
-| OS | Versions |Images|
-|:---|:--|:--|
-| [**Alpine**](https://alpinelinux.org/) | 3.22, 3.21, 3.20 | [Link](https://alpinelinux.org/cloud/) |
-| [**Alma Linux**](https://almalinux.org/) | 10, 9, 8 | [Link](https://almalinux.org/get-almalinux/#Cloud_Images) |
-| [**Amazon Linux**](https://aws.amazon.com/de/linux/) | 2023<br>2 | [Link](https://cdn.amazonlinux.com/al2023/os-images/latest/)<br>[Link](https://cdn.amazonlinux.com/os-images/latest/)  |
-| [**Arch Linux**](https://archlinux.org/) | Latest | [Link](https://mirror.pkgbuild.com/images/latest/) |
-| [**CentOS Stream**](https://www.centos.org/) | 10, 9 | [Link](https://cloud.centos.org/centos/) |
-| [**Debian**](https://www.debian.org/) | 13 (Trixie), 12 (Bookworm) | [Link](https://cloud.debian.org/images/cloud/) |
-| [**Fedora**](https://getfedora.org/) | Cloud 43 | [Link](https://fedoraproject.org/cloud/download) |
-| [**Flatcar Container Linux**](https://flatcar-linux.org/) | Stable, Beta, Alpha | [Link](https://www.flatcar.org/releases) |
-| [**FreeBSD**](https://www.freebsd.org/) | 14.3 | [Link](https://download.freebsd.org/releases/VM-IMAGES/) |
-| [**Gentoo Linux**](https://www.gentoo.org/) | 20251130 | [Link](https://www.gentoo.org/downloads/#other-arches) |
-| [**Kali Linux**](https://www.kali.org/) | 2025.3 | [Link](https://www.kali.org/get-kali/#kali-cloud) |
-| [**openSUSE**](https://www.opensuse.org/) | Tumbleweed | [Link](https://get.opensuse.org/tumbleweed/?type=server#download) |
-| [**Oracle Linux**](https://www.oracle.com/linux/) | 10.0, 9.6, 8.10, 7.9 | [Link](https://yum.oracle.com/oracle-linux-templates.html) |
-| [**Rocky Linux**](https://rockylinux.org/) | 10, 9, 8 | [Link](https://rockylinux.org/download) |
-| [**Ubuntu**](https://ubuntu.com/) | 25.10, 25.04, 24.04 LTS, 22.04 LTS | [Link](https://cloud-images.ubuntu.com/) |
+- Alma Linux
+- Alpine Linux
+- Amazon Linux
+- Arch Linux
+- CentOS Stream
+- Debian
+- Fedora Cloud
+- Flatcar Container Linux
+- FreeBSD
+- Gentoo Linux
+- Kali Linux
+- openSUSE tumbleweed
+- Oracle Linux
+- Rocky Linux
+- Ubuntu
 
 ## Template Specifications
 
