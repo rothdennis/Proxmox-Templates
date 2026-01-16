@@ -63,7 +63,7 @@ jobs:
           fi
       
       - name: Create issue for failures
-        if: failure() && steps.parse.outputs.has_failures == 'true' && github.event_name == 'schedule'
+        if: failure() && steps.parse.outputs.has_failures == 'true'
         uses: actions/github-script@v7
         with:
           script: |
