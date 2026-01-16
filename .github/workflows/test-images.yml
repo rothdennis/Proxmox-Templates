@@ -56,8 +56,8 @@ jobs:
         run: |
           if grep -q "FAILED URL SUMMARY" test_output.txt; then
             echo "has_failures=true" >> $GITHUB_OUTPUT
-            # Extract failed URLs for issue body
-            sed -n '/FAILED URL SUMMARY/,/====/p' test_output.txt > failures.txt
+            # Extract from the header to the end of the file ($p)
+            sed -n '/FAILED URL SUMMARY/,$p' test_output.txt > failures.txt
           else
             echo "has_failures=false" >> $GITHUB_OUTPUT
           fi
