@@ -56,11 +56,11 @@ def find_latest_gentoo_url():
         date = today - timedelta(days=days_ago)
         date_str = date.strftime('%Y%m%d')
         
+        print(f"  Trying: {date_str} ({date.strftime('%Y-%m-%d')})")
         # Try common build times (many projects build at specific times)
         for time_str in ['140056Z', '140000Z', '120000Z', '080000Z', '000000Z']:
             filename = f'di-amd64-cloudinit-{date_str}T{time_str}.qcow2'
             url = base_url + filename
-            print(f"  Trying: {date_str} ({date.strftime('%Y-%m-%d')})")
             if test_url(url):
                 print(f"  ✓ Found: {url}")
                 return url
@@ -83,13 +83,16 @@ def main():
         print(url)
         print("\nTo add this to images.json, use:")
         
-        # Extract date from URL
-        if 'di-amd64-cloudinit-' in url:
-            timestamp = url.split('di-amd64-cloudinit-')[1].split('.qcow2')[0]
-            date_str = timestamp[:8]  # YYYYMMDD
-            formatted_date = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
-            
-            print(f"""
+        # Extract date from URL if it matches the expected pattern
+        if 'di-amd64-cloudinit-' in url and '.qcow2' in url:
+            try:
+                timestamp = url.split('di-amd64-cloudinit-')[1].split('.qcow2')[0]
+                # Validate timestamp has at least 8 characters (YYYYMMDD)
+                if len(timestamp) >= 8 and timestamp[:8].isdigit():
+                    date_str = timestamp[:8]  # YYYYMMDD
+                    formatted_date = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
+                    
+                    print(f"""
 {{
     "Gentoo Linux": {{
         "tag": "gentoo",
@@ -102,6 +105,15 @@ def main():
     }}
 }}
 """)
+                else:
+                    print(f"\nWarning: Could not extract date from URL format.")
+                    print(f"Please manually format the entry for images.json.")
+            except (IndexError, ValueError) as e:
+                print(f"\nWarning: Could not parse URL format: {e}")
+                print(f"Please manually format the entry for images.json.")
+        else:
+            print(f"\nNote: URL uses a symlink or non-standard format.")
+            print(f"You can add it to images.json with an appropriate version name.")
         return 0
     else:
         print(f"\n{'='*80}")
