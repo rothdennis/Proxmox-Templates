@@ -74,6 +74,7 @@ Gentoo Linux cloud images are available but use timestamped URLs that change fre
 
 1. Visit [Gentoo's autobuilds directory](https://distfiles.gentoo.org/releases/amd64/autobuilds/current-di-amd64-cloudinit/)
 2. Find the latest `di-amd64-cloudinit-YYYYMMDDTHHMMSSZ.qcow2` file
+   - Alternatively, run the included `find_gentoo_url.py` helper script to automatically discover the current URL
 3. Add the following entry to your `images.json`:
 
 ```json
@@ -88,7 +89,7 @@ Gentoo Linux cloud images are available but use timestamped URLs that change fre
 }
 ```
 
-**Note:** Gentoo images require UEFI/OVMF BIOS and will be automatically configured with the necessary EFI disk settings.
+**Note:** Once Gentoo is added to `images.json`, the `generate.py` script will automatically configure Gentoo templates with the required UEFI/OVMF BIOS and EFI disk settings.
 
 ## Template Specifications
 
