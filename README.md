@@ -62,12 +62,33 @@ The script automatically assigns the next available VM ID starting at 900.
 - Fedora Cloud
 - Flatcar Container Linux
 - FreeBSD
-- Gentoo Linux
 - Kali Linux
 - openSUSE tumbleweed
 - Oracle Linux
 - Rocky Linux
 - Ubuntu
+
+### Gentoo Linux (Manual Configuration Required)
+
+Gentoo Linux cloud images are available but use timestamped URLs that change frequently, making them difficult to maintain in an automated fashion. If you'd like to use Gentoo, you can manually add it to your local `images.json` file:
+
+1. Visit [Gentoo's autobuilds directory](https://distfiles.gentoo.org/releases/amd64/autobuilds/current-di-amd64-cloudinit/)
+2. Find the latest `di-amd64-cloudinit-YYYYMMDDTHHMMSSZ.qcow2` file
+3. Add the following entry to your `images.json`:
+
+```json
+"Gentoo Linux": {
+    "tag": "gentoo",
+    "versions": [
+        {
+            "name": "YYYY-MM-DD",
+            "url": "https://distfiles.gentoo.org/releases/amd64/autobuilds/current-di-amd64-cloudinit/di-amd64-cloudinit-YYYYMMDDTHHMMSSZ.qcow2"
+        }
+    ]
+}
+```
+
+**Note:** Gentoo images require UEFI/OVMF BIOS and will be automatically configured with the necessary EFI disk settings.
 
 ## Template Specifications
 

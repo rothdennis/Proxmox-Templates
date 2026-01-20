@@ -121,15 +121,6 @@
             }
         ]
     },
-    "Gentoo Linux": {
-        "tag": "gentoo",
-        "versions": [
-            {
-                "name": "2026-01-14",
-                "url": "https://distfiles.gentoo.org/releases/amd64/autobuilds/current-di-amd64-cloudinit/di-amd64-cloudinit-20260114T140056Z.qcow2"
-            }
-        ]
-    },
     "Kali Linux": {
         "tag": "kali",
         "versions": [
