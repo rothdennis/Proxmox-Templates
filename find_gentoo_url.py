@@ -90,7 +90,13 @@ def main():
                 # Validate timestamp has at least 8 characters (YYYYMMDD)
                 if len(timestamp) >= 8 and timestamp[:8].isdigit():
                     date_str = timestamp[:8]  # YYYYMMDD
-                    formatted_date = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
+                    year, month, day = int(date_str[:4]), int(date_str[4:6]), int(date_str[6:8])
+                    
+                    # Validate date components are in reasonable ranges
+                    if not (1900 <= year <= 2100 and 1 <= month <= 12 and 1 <= day <= 31):
+                        raise ValueError(f"Invalid date components: {year}-{month:02d}-{day:02d}")
+                    
+                    formatted_date = f"{year}-{month:02d}-{day:02d}"
                     
                     print(f"""
 {{
