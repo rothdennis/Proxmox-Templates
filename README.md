@@ -62,7 +62,6 @@ The script automatically assigns the next available VM ID starting at 900.
 - Fedora Cloud
 - Flatcar Container Linux
 - FreeBSD
-- Gentoo Linux
 - Kali Linux
 - openSUSE tumbleweed
 - Oracle Linux
