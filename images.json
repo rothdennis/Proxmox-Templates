@@ -125,8 +125,12 @@
         "tag": "kali",
         "versions": [
             {
-                "name": "2025.3",
-                "url": "https://kali.download/cloud-images/kali-2025.3/kali-linux-2025.3-cloud-genericcloud-amd64.tar.xz"
+                "name": "2025.4",
+                "url": "https://kali.download/cloud-images/kali-2025.4/kali-linux-2025.4-cloud-genericcloud-amd64.tar.xz"
+            },
+            {
+                "name": "2026.1",
+                "url": "https://kali.download/cloud-images/kali-2026.1/kali-linux-2026.1-cloud-genericcloud-amd64.tar.xz"
             }
         ]
     },
