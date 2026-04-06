@@ -14,10 +14,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - 'images.json'
-      - 'test.py'
-      - '.github/workflows/test-images.yml'
 
 jobs:
   test-images:
