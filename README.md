@@ -1,6 +1,8 @@
 # Proxmox Templates
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CodeQL](https://github.com/rothdennis/Proxmox-Templates/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/rothdennis/Proxmox-Templates/actions/workflows/github-code-scanning/codeql)
+[![Test Image URLs](https://github.com/rothdennis/Proxmox-Templates/actions/workflows/test-images.yml/badge.svg)](https://github.com/rothdennis/Proxmox-Templates/actions/workflows/test-images.yml)
 
 A Python tool for automating the creation of cloud-init enabled VM templates in Proxmox VE. Simplifies downloading official cloud images and converting them into ready-to-use templates.
 
